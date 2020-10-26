@@ -65,7 +65,7 @@ class Client:
 
     def get_incident_events(self, incident: IncidentType) -> List[models.Event]:
         """Returns a list of all events related to an Incident"""
-        pk = incident["pk"] if isinstance(incident, models.Incident) else int(incident)
+        pk = incident.pk if isinstance(incident, models.Incident) else int(incident)
         response = self.api.events.list(pk)
         return [models.Event.from_json(record) for record in response.body]
 
@@ -73,7 +73,7 @@ class Client:
         self, incident: IncidentType
     ) -> List[models.Acknowledgement]:
         """Returns a list of all acknowledgements on an Incident"""
-        pk = incident["pk"] if isinstance(incident, models.Incident) else int(incident)
+        pk = incident.pk if isinstance(incident, models.Incident) else int(incident)
         response = self.api.acknowledgements.list(pk)
         return [models.Acknowledgement.from_json(record) for record in response.body]
 
