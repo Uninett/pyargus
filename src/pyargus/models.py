@@ -59,6 +59,26 @@ class Incident:
 
         return cls(**kwargs)
 
+    def to_json(self) -> dict:
+        """Despite the name, this serializes this object into a dict that is suitable
+        for feeding to the stdlib JSON serializer.
+        """
+        result = {}
+        for field in self.__dataclass_fields__:
+            value = getattr(self, field)
+            if value:
+                if field == "start_time" and isinstance(value, datetime):
+                    value = value.isoformat()
+                if field == "end_time" and isinstance(value, datetime):
+                    value = value.isoformat() if value != datetime.max else "infinity"
+                if field == "source":
+                    continue  # Source will be assigned by Argus when posted
+                if field == "tags":
+                    tags = ("{}={}".format(k, v) for k, v in value.items())
+                    value = [{"tag": t} for t in tags]
+                result[field] = value
+        return result
+
 
 @dataclass
 class Event:

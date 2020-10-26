@@ -75,6 +75,28 @@ class Client:
         response = self.api.acknowledgements.list(pk)
         return [models.Acknowledgement.from_json(record) for record in response.body]
 
+    def post_incident(self, incident: models.Incident) -> models.Incident:
+        """Posts a new Incident to Argus.
+
+        :returns: A full Incident description as returned from the API.
+        """
+        body = incident.to_json()
+        response = self.api.incidents.create(body=body)
+        return models.Incident.from_json(response.body)
+
+    def update_incident(self, incident: models.Incident) -> models.Incident:
+        """Updates an Argus Incident.
+
+        :returns: A full Incident description as returned from the API.
+        """
+        pk = incident.pk
+        body = incident.to_json()
+        # The API takes the primary key as part of the URL, not as part of the body
+        if "pk" in body:
+            del body["pk"]
+        response = self.api.incidents.update(pk, body=body)
+        return models.Incident.from_json(response.body)
+
 
 def paginated_query(method: Callable, *args, **kwargs) -> Iterator[Tuple]:
     """Extracts paginated results from a simple_rest_client API call.
