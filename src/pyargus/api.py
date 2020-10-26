@@ -14,6 +14,7 @@ def connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
         headers=headers,
         timeout=timeout,
         json_encode_body=True,
+        append_slash=True,
     )
     argusapi.add_resource(resource_name="incidents", resource_class=IncidentResource)
     argusapi.add_resource(resource_name="events", resource_class=IncidentEventResource)
