@@ -104,6 +104,23 @@ class Event:
         kwargs["type"] = kwargs["type"]["value"]
         return cls(**kwargs)
 
+    def to_json(self) -> dict:
+        """Despite the name, this serializes this object into a dict that is suitable
+        for feeding to the stdlib JSON serializer.
+        """
+        result = {}
+        for field in self.__dataclass_fields__:
+            value = getattr(self, field)
+            if value:
+                if field == "actor":
+                    continue  # Actor is decided by Argus
+                if field == "received":
+                    continue  # Received timestamp is decided by Argus
+                if field == "timestamp" and isinstance(value, datetime):
+                    value = value.isoformat()
+                result[field] = value
+        return result
+
 
 @dataclass
 class Acknowledgement:

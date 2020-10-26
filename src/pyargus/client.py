@@ -1,5 +1,7 @@
 """Slightly higher level Argus API client abstraction"""
 from __future__ import annotations
+
+from datetime import datetime
 from typing import List, TypeVar, Iterator, Callable, Tuple
 from urllib.parse import urlparse, parse_qs
 
@@ -96,6 +98,35 @@ class Client:
             del body["pk"]
         response = self.api.incidents.update(pk, body=body)
         return models.Incident.from_json(response.body)
+
+    def resolve_incident(
+        self,
+        incident: IncidentType,
+        description: str = None,
+        timestamp: datetime = None,
+    ) -> models.Incident:
+        """Resolves an Argus Incident
+
+        :param description: An optional event description to post.
+        :param timestamp: When the event happened. Defaults to the current datetime.
+        :returns: A full Event description as returned from the API.
+        """
+        if timestamp is None:
+            timestamp = datetime.now()
+        end_event = models.Event(
+            description=description, timestamp=timestamp, type="END"
+        )
+        return self.post_incident_event(incident, end_event)
+
+    def post_incident_event(self, incident: IncidentType, event: models.Event):
+        """Posts a new Incident Event to Argus
+
+        :returns: A full Event description as returned from the API.
+        """
+        incident_pk = incident if isinstance(incident, int) else incident.pk
+        body = event.to_json()
+        response = self.api.events.create(incident_pk, body=body)
+        return models.Event.from_json(response.body)
 
 
 def paginated_query(method: Callable, *args, **kwargs) -> Iterator[Tuple]:
