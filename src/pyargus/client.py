@@ -25,6 +25,9 @@ class Client:
     def __init__(self, api_root_url: str, token: str, timeout: float = 2.0):
         self.api = api.connect(api_root_url, token, timeout)
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
+
     def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""
         response = self.api.incidents.retrieve(incident_id)
