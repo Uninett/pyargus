@@ -171,7 +171,7 @@ def is_paginated_response(response: Response):
 
 def has_next_page(response: Response) -> bool:
     """Returns True if a paginated API response appears to have further result pages"""
-    return bool(response.body.get("page"))
+    return bool(response.body.get("next"))
 
 
 def extract_params(url: str) -> dict:
