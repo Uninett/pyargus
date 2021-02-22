@@ -34,7 +34,6 @@ class IncidentResource(Resource):
         "retrieve": {"method": "GET", "url": "incidents/{}"},
         "update": {"method": "PATCH", "url": "incidents/{}"},
         "set_ticket_url": {"method": "PUT", "url": "incidents/{}/ticket_url/"},
-        "metadata": {"method": "GET", "url": "incidents/metadata"},
     }
 
 
