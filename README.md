@@ -79,7 +79,7 @@ attribute `pk`, in case you need to address it directly later.
 
 ### Close an existing incident
 
-Incidents are closed by posting a *CLOSE* type event to an incident's event
+Incidents are closed by posting a *END* type event to an incident's event
 log, with an optional timestamp. The `Client` class provides the follow
 convenience method for this operation:
 
