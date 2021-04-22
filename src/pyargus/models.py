@@ -33,6 +33,7 @@ class Incident:
     source_incident_id: str = None
     details_url: str = None
     description: str = None
+    level: int = None
     ticket_url: str = None
     tags: dict = None
     stateful: bool = None
