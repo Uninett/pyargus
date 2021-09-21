@@ -67,7 +67,7 @@ class Incident:
         result = {}
         for field in self.__dataclass_fields__:
             value = getattr(self, field)
-            if value:
+            if value or field == "end_time":
                 if field == "start_time" and isinstance(value, datetime):
                     value = value.isoformat()
                 if field == "end_time" and isinstance(value, datetime):
