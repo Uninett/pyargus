@@ -78,6 +78,8 @@ class Incident:
                     tags = ("{}={}".format(k, v) for k, v in value.items())
                     value = [{"tag": t} for t in tags]
                 result[field] = value
+        if "tags" not in result:  # API requires tags to be present, but it can be empty
+            result["tags"] = []
         return result
 
 
