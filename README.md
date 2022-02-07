@@ -115,6 +115,24 @@ Incident(pk=8, start_time=datetime.datetime(2021, 4, 22, 11, 41, 53, 580947, tzi
 
 ```
 
+### Stateless incidents
+
+Argus supports a concept of "stateless" incidents. Stateless incidents
+represent single points in time, and do not have an end time. To explicitly
+create stateless incidents, set the `end_time` attribute to the STATELESS
+sentinel, like so:
+
+```python
+from datetime import datetime
+from pyargus.models import Incident, STATELESS
+
+stateless_incident = Incident(
+    description="Something happened",
+    start_time=datetime.now(),
+    end_time=STATELESS
+)
+```
+
 ## BUGS
 
 * Doesn't provide high-level error handling yet.
