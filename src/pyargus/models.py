@@ -3,6 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from iso8601 import parse_date
 
+# STATELESS is a sentinel used as an `end_time` value to explicitly indicate that an
+# incident is in fact stateless. To the Argus API, this is represented by a null/None
+# value, but None is interpreted by this library as "not set" or "do not set", so we
+# need an explicit value to flag stateless incidents.
+class _STATELESS_TYPE:
+    pass
+STATELESS = _STATELESS_TYPE()
 
 @dataclass
 class SourceSystem:
@@ -52,6 +59,8 @@ class Incident:
                 if kwargs["end_time"] != "infinity"
                 else datetime.max
             )
+        elif "end_time" in kwargs:
+            kwargs["end_time"] = STATELESS
         kwargs["source"] = SourceSystem.from_json(kwargs["source"])
 
         tags = [tag["tag"] for tag in kwargs["tags"]]
@@ -67,11 +76,13 @@ class Incident:
         result = {}
         for field in self.__dataclass_fields__:
             value = getattr(self, field)
-            if value or field == "end_time":
+            if value:
                 if field == "start_time" and isinstance(value, datetime):
                     value = value.isoformat()
                 if field == "end_time" and isinstance(value, datetime):
                     value = value.isoformat() if value != datetime.max else "infinity"
+                if field == "end_time" and value is STATELESS:
+                    value = None
                 if field == "source":
                     continue  # Source will be assigned by Argus when posted
                 if field == "tags":
