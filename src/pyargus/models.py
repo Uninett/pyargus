@@ -59,7 +59,7 @@ class Incident:
                 if kwargs["end_time"] != "infinity"
                 else datetime.max
             )
-        elif "end_time" in kwargs:
+        else:
             kwargs["end_time"] = STATELESS
         kwargs["source"] = SourceSystem.from_json(kwargs["source"])
 
