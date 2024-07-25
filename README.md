@@ -18,7 +18,7 @@ incident-related endpoints are supported.
 
 The `Client` class is found in `pyargus.client`, and the various supported data
 models, such as `Incident`, `Event`, `Acknowledgement` and `SourceSystem`, are
-implemented in `pyargus.models.
+implemented in `pyargus.models`.
 
 ### Listing open incidents that have not been acknowledged
 
@@ -39,7 +39,7 @@ verbatim into the arguments supported by the `/incidents` endpoint in the API.
 ### List only "my" incidents
 
 The incidents API also has an `/incidents/mine` endpoint, which works just like
-the `/incidents` endpoint, but searches onl only the incidents that were posted
+the `/incidents` endpoint, but searches only the incidents that were posted
 by the connecting user. This is useful for glue services, when they need to
 compare the list of open Argus incidents it has produced with the current list
 of active alerts in its source system.
@@ -93,7 +93,7 @@ Event(pk=10, actor='testnav', description='The demolition was cancelled', incide
 
 ### Modify an existing incident
 
-Argus does not allow modification of most an incident's attributes, but things
+Argus does not allow modification of most incident attributes, but things
 like the tag list can be changed. Modifications are made by constructing an
 `Incident` object with the `pk` attribute set to the id of the incident you
 wish you modify, and then adding values to the attributes you wish to modify:
