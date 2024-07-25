@@ -48,6 +48,7 @@ class Incident:
     stateful: bool = None
     open: bool = None
     acked: bool = None
+    metadata: dict = None
 
     @classmethod
     def from_json(cls, data: dict) -> Incident:
