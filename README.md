@@ -24,7 +24,7 @@ implemented in `pyargus.models.
 
 ```pycon
 >>> from pyargus.client import Client
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> for incident in c.get_incidents(open=True, acked=False):
 ...    print(incident)
 ...
@@ -48,7 +48,7 @@ Example:
 
 ```pycon
 >>> from pyargus.client import Client
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> for incident in c.get_my_incidents(open=True, acked=False):
 ...    print(incident)
 ...
@@ -61,7 +61,7 @@ Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzin
 >>> from pyargus.client import Client
 >>> from pyargus.models import Incident
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
 ...     description="The earth was demolished to make way for a hyperspace bypass", 
 ...     start_time=datetime.now(),
@@ -86,7 +86,7 @@ convenience method for this operation:
 ```pycon
 >>> from pyargus.client import Client
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> c.resolve_incident(incident=8, description="The demolition was cancelled", timestamp=datetime.now())
 Event(pk=10, actor='testnav', description='The demolition was cancelled', incident=8, received=datetime.datetime(2021, 4, 22, 11, 47, 11, 978438, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), timestamp=datetime.datetime(2021, 4, 22, 11, 47, 11, 946076, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), type='END')
 ```
@@ -102,7 +102,7 @@ wish you modify, and then adding values to the attributes you wish to modify:
 >>> from pyargus.client import Client
 >>> from pyargus.models import Incident
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
 ...     pk=8,
 ...     tags={
