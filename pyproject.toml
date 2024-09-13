@@ -1,6 +1,6 @@
 [project]
 name = "argus-api-client"
-version = "0.5.0"
+dynamic = ["version"]
 description = "A Python API client library for the Argus alert aggregator server"
 readme = "README.md"
 authors = [{name="Sikt - Kunnskapssektorens Tjenesteleverandør", email="kontakt@sikt.no"}]
@@ -19,6 +19,9 @@ dependencies = [
     "simple_rest_client",
     "iso8601",
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "pyargus.VERSION"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
