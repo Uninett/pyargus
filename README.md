@@ -18,13 +18,13 @@ incident-related endpoints are supported.
 
 The `Client` class is found in `pyargus.client`, and the various supported data
 models, such as `Incident`, `Event`, `Acknowledgement` and `SourceSystem`, are
-implemented in `pyargus.models.
+implemented in `pyargus.models`.
 
 ### Listing open incidents that have not been acknowledged
 
 ```pycon
 >>> from pyargus.client import Client
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> for incident in c.get_incidents(open=True, acked=False):
 ...    print(incident)
 ...
@@ -39,7 +39,7 @@ verbatim into the arguments supported by the `/incidents` endpoint in the API.
 ### List only "my" incidents
 
 The incidents API also has an `/incidents/mine` endpoint, which works just like
-the `/incidents` endpoint, but searches onl only the incidents that were posted
+the `/incidents` endpoint, but searches only the incidents that were posted
 by the connecting user. This is useful for glue services, when they need to
 compare the list of open Argus incidents it has produced with the current list
 of active alerts in its source system.
@@ -48,7 +48,7 @@ Example:
 
 ```pycon
 >>> from pyargus.client import Client
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> for incident in c.get_my_incidents(open=True, acked=False):
 ...    print(incident)
 ...
@@ -61,7 +61,7 @@ Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzin
 >>> from pyargus.client import Client
 >>> from pyargus.models import Incident
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
 ...     description="The earth was demolished to make way for a hyperspace bypass", 
 ...     start_time=datetime.now(),
@@ -86,14 +86,14 @@ convenience method for this operation:
 ```pycon
 >>> from pyargus.client import Client
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> c.resolve_incident(incident=8, description="The demolition was cancelled", timestamp=datetime.now())
 Event(pk=10, actor='testnav', description='The demolition was cancelled', incident=8, received=datetime.datetime(2021, 4, 22, 11, 47, 11, 978438, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), timestamp=datetime.datetime(2021, 4, 22, 11, 47, 11, 946076, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), type='END')
 ```
 
 ### Modify an existing incident
 
-Argus does not allow modification of most an incident's attributes, but things
+Argus does not allow modification of most incident attributes, but things
 like the tag list can be changed. Modifications are made by constructing an
 `Incident` object with the `pk` attribute set to the id of the incident you
 wish you modify, and then adding values to the attributes you wish to modify:
@@ -102,7 +102,7 @@ wish you modify, and then adding values to the attributes you wish to modify:
 >>> from pyargus.client import Client
 >>> from pyargus.models import Incident
 >>> from datetime import datetime
->>> c = Client(api_root_url="https://argus.example.org/api/v1", token="foobar")
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
 ...     pk=8,
 ...     tags={
