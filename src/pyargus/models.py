@@ -2,6 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from iso8601 import parse_date
+import inspect
+
 
 # STATELESS is a sentinel used as an `end_time` value to explicitly indicate that an
 # incident is in fact stateless. To the Argus API, this is represented by a null/None
@@ -46,6 +48,7 @@ class Incident:
     stateful: bool = None
     open: bool = None
     acked: bool = None
+    metadata: dict = None
 
     @classmethod
     def from_json(cls, data: dict) -> Incident:
@@ -67,7 +70,13 @@ class Incident:
         tags = dict(tag.split("=", maxsplit=1) for tag in tags)
         kwargs["tags"] = tags
 
-        return cls(**kwargs)
+        return cls(
+            **{
+                key: value
+                for key, value in kwargs.items()
+                if key in inspect.signature(cls).parameters
+            }
+        )
 
     def to_json(self) -> dict:
         """Despite the name, this serializes this object into a dict that is suitable
