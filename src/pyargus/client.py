@@ -131,6 +131,19 @@ class Client:
         response = self.api.events.create(incident_pk, body=body)
         return models.Event.from_json(response.body)
 
+    def refresh_token(self) -> models.ExpiringToken:
+        """Post w/o body to get a new token and its expiration timestamp
+
+        It will be necessary to re-initialize the client as the old token has
+        been rendered invalid.
+
+        Store the new token (and the returned expiration datetime) where your
+        program can load it on next run: environment variable, config file or
+        secrets file.
+        """
+        response = self.api.tokens.refresh()
+        return models.ExpiringToken.from_json(response.body)
+
 
 def paginated_query(method: Callable, *args, **kwargs) -> Iterator[Tuple]:
     """Extracts paginated results from a simple_rest_client API call.

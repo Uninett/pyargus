@@ -164,3 +164,19 @@ class Acknowledgement:
             else None,
         }
         return cls(**kwargs)
+
+
+@dataclass
+class ExpiringToken:
+    """Class for describing the authentication token"""
+
+    expiration: datetime
+    token: int
+
+    @classmethod
+    def from_json(cls, data: dict) -> ExpiringToken:
+        kwargs = {
+            "expiration": parse_date(data["expiration"]),
+            "token": parse_date(data["token"]),
+        }
+        return cls(**kwargs)
