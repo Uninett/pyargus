@@ -19,6 +19,19 @@ dependencies = [
     "iso8601",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "build",
+    "coverage",
+    "ipython",
+    "isort",
+    "pre-commit",
+    "pytest",
+    "ruff",
+    "tox",
+    "twine",
+]
+
 [tool.setuptools.dynamic]
 version = {attr = "pyargus.VERSION"}
 
