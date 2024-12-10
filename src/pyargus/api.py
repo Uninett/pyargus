@@ -21,6 +21,7 @@ def connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
     argusapi.add_resource(
         resource_name="acknowledgements", resource_class=IncidentAcknowledgementResource
     )
+    argusapi.add_resource(resource_name="tokens", resource_class=ExpiringTokenResource)
     return argusapi
 
 
@@ -50,4 +51,10 @@ class IncidentAcknowledgementResource(Resource):
         "list": {"method": "GET", "url": "incidents/{}/acks"},
         "create": {"method": "POST", "url": "incidents/{}/acks"},
         "retrieve": {"method": "GET", "url": "incidents/{}/acks/{}"},
+    }
+
+
+class ExpiringTokenResource(Resource):
+    actions = {
+        "refresh": {"method": "POST", "url": "auth/token/login/"},
     }

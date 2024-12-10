@@ -133,6 +133,20 @@ stateless_incident = Incident(
 )
 ```
 
+
+### Get a new authentication token
+
+If your argus server is running version 1.29.0 or newer you can request to get
+a new token (with a new expiration date) via API version 2. The token you are
+using to access the server with must still be valid.
+
+```python
+tokenobj = c.refresh_token()
+c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token)
+# save the contents of tokenobj in an environment variable, config file or
+# secrets file so that it is not lost on program exit
+```
+
 ## BUGS
 
 * Doesn't provide high-level error handling yet.
