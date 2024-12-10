@@ -11,7 +11,10 @@ import inspect
 # need an explicit value to flag stateless incidents.
 class _STATELESS_TYPE:
     pass
+
+
 STATELESS = _STATELESS_TYPE()
+
 
 @dataclass
 class SourceSystem:

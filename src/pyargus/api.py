@@ -1,4 +1,5 @@
 """Defines a low-level API interface for Argus using simple_rest_client"""
+
 from simple_rest_client.api import API
 from simple_rest_client.resource import Resource
 
