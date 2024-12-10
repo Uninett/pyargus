@@ -1,4 +1,6 @@
 # Argus API Client
+[![test badge](https://img.shields.io/github/actions/workflow/status/Uninett/pyargus/tox.yml?branch=master)](https://github.com/Uninett/pyargus/actions)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 This is the official Python client library for the 
 [Argus](https://github.com/Uninett/Argus) API server.
