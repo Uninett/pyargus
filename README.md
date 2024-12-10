@@ -136,3 +136,17 @@ stateless_incident = Incident(
 ## BUGS
 
 * Doesn't provide high-level error handling yet.
+
+## Development
+
+### Code style
+
+Pyargus uses *ruff* as a source code formatter. Ruff is part of the optional dev dependencies listed in
+[pyproject.toml](./pyproject.toml)
+
+A pre-commit hook will format new code automatically before committing.
+To enable this pre-commit hook, run
+
+```console
+$ pre-commit install
+```
