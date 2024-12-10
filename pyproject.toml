@@ -38,3 +38,14 @@ version = {attr = "pyargus.VERSION"}
 [tool.setuptools.packages.find]
 where = ["src"]
 exclude = ["tests*"]
+
+[tool.ruff]
+line-length = 88
+extend-exclude = [
+    ".egg-info",
+]
+output-format = "full"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F4", "F5", "F6", "F7", "F8", "F9"]
+ignore = ["F403", "F405"]
