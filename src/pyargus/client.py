@@ -1,4 +1,5 @@
 """Slightly higher level Argus API client abstraction"""
+
 from __future__ import annotations
 
 from datetime import datetime

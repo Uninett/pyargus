@@ -1,4 +1,6 @@
 # Argus API Client
+[![test badge](https://img.shields.io/github/actions/workflow/status/Uninett/pyargus/tox.yml?branch=master)](https://github.com/Uninett/pyargus/actions)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 This is the official Python client library for the 
 [Argus](https://github.com/Uninett/Argus) API server.
@@ -150,3 +152,17 @@ c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token
 ## BUGS
 
 * Doesn't provide high-level error handling yet.
+
+## Development
+
+### Code style
+
+Pyargus uses *ruff* as a source code formatter. Ruff is part of the optional dev dependencies listed in
+[pyproject.toml](./pyproject.toml)
+
+A pre-commit hook will format new code automatically before committing.
+To enable this pre-commit hook, run
+
+```console
+$ pre-commit install
+```
