@@ -1,0 +1,32 @@
+# Defines an Argus backend to use for integration testing
+services:
+  argus_api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - SECRET_KEY=xahQuuWaip1Ookeegaibo6yoj5ij8shok8Eg7eiyeBoo9AaQu5b
+      - TIME_ZONE=Europe/Oslo
+      - DATABASE_URL=postgresql://argus:argus@postgres/argus
+      - ARGUS_REDIS_SERVER=redis
+      - ARGUS_FRONTEND_URL=http://localhost:3000  # fake it till you make it  #maybe not need this
+      - ARGUS_COOKIE_DOMAIN=localhost   # maybe not need this
+      - STATIC_ROOT=static/
+      - ARGUS_SEND_NOTIFICATIONS=0
+      - EMAIL_HOST=localhost
+      - DEFAULT_FROM_EMAIL=ci-test@example.org
+    restart: always
+
+  postgres:
+    image: "postgres:14"
+    environment:
+      - POSTGRES_USER=argus
+      - POSTGRES_PASSWORD=argus
+      - POSTGRES_DB=argus
+    restart: always
+
+  redis:
+    image: "redis:latest"
