@@ -44,4 +44,3 @@ line-length = 88
 extend-exclude = [
     ".egg-info",
 ]
-output-format = "full"
