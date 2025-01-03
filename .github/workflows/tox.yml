@@ -1,4 +1,4 @@
-name: Python package
+name: Lint and test
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
     - uses: astral-sh/ruff-action@v3
 
 
-  build:
-
+  test:
+    needs: ruff
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,14 +23,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip "setuptools<46" wheel
-        pip install tox tox-gh-actions
+
     - name: Test with tox
       run: |
         tox
