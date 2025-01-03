@@ -1,4 +1,4 @@
-name: Python package
+name: Lint and test
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
     - uses: astral-sh/ruff-action@v3
 
 
-  build:
-
+  test:
+    needs: ruff
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,14 +23,46 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip "setuptools<46" wheel
-        pip install tox tox-gh-actions
+        pip install tox tox-gh-actions coverage
+
     - name: Test with tox
       run: |
         tox
+
+    - name: Upload test reports (${{ matrix.python-version }})
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: reports-${{ matrix.python-version }} 
+        path: |
+          reports/**/*
+  
+  upload-pr-number-base-sha:
+    name: Save PR number and base SHA in artifact
+    runs-on: ubuntu-latest
+    if: ${{ github.event.number && always() }}
+    env:
+      PR_NUMBER: ${{ github.event.number }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - name: Make PR number file
+        run: |
+          mkdir -p ./extra
+          echo $PR_NUMBER > ./extra/pr_number
+      - name: Make base SHA file
+        run: |
+          echo $BASE_SHA > ./extra/base_sha
+      - name: Upload PR number file and base SHA file
+        uses: actions/upload-artifact@v4
+        with:
+          name: extra
+          path: extra/
