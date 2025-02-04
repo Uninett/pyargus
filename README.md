@@ -2,10 +2,10 @@
 [![test badge](https://img.shields.io/github/actions/workflow/status/Uninett/pyargus/tox.yml?branch=master)](https://github.com/Uninett/pyargus/actions)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-This is the official Python client library for the 
+This is the official Python client library for the
 [Argus](https://github.com/Uninett/Argus) API server.
 
-The Argus server is an incident registry, capable of aggregating alerts from 
+The Argus server is an incident registry, capable of aggregating alerts from
 multiple source systems. Argus also can send event notifications (via e-mail,
 SMS, etc.) when incidents are created or resolved.
 
@@ -65,7 +65,7 @@ Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzin
 >>> from datetime import datetime
 >>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
-...     description="The earth was demolished to make way for a hyperspace bypass", 
+...     description="The earth was demolished to make way for a hyperspace bypass",
 ...     start_time=datetime.now(),
 ...     tags={
 ...         "host": "earth.example.org",
