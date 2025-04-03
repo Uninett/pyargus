@@ -122,7 +122,9 @@ class Client:
         )
         return self.post_incident_event(incident, end_event)
 
-    def post_incident_event(self, incident: IncidentType, event: models.Event):
+    def post_incident_event(
+        self, incident: IncidentType, event: models.Event
+    ) -> models.Event:
         """Posts a new Incident Event to Argus
 
         :returns: A full Event description as returned from the API.
