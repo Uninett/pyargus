@@ -108,7 +108,7 @@ class Client:
         incident: IncidentType,
         description: str = None,
         timestamp: datetime = None,
-    ) -> models.Incident:
+    ) -> models.Event:
         """Resolves an Argus Incident
 
         :param description: An optional event description to post.
