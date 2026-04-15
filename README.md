@@ -149,6 +149,30 @@ c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token
 # secrets file so that it is not lost on program exit
 ```
 
+## Async usage
+
+An `AsyncClient` is available for use in asyncio-based applications. It mirrors
+the `Client` interface, but all methods are coroutines. Use `python -m asyncio`
+to try these examples interactively:
+
+```pycon
+>>> from pyargus.async_client import AsyncClient
+>>> from pyargus.models import Incident
+>>> from datetime import datetime
+>>> c = AsyncClient(api_root_url="https://argus.example.org/api/v2", token="foobar")
+>>> async for incident in c.get_incidents(open=True, acked=False):
+...    print(incident)
+...
+Incident(pk=4, ...)
+>>> i = Incident(
+...     description="The earth was demolished to make way for a hyperspace bypass",
+...     start_time=datetime.now(),
+...     tags={"host": "earth.example.org"},
+... )
+>>> await c.post_incident(i)
+Incident(pk=8, ...)
+```
+
 ## BUGS
 
 * Doesn't provide high-level error handling yet.
