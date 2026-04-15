@@ -1,4 +1,5 @@
 import pytest
+
 from pyargus import api
 
 

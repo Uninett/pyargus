@@ -13,6 +13,8 @@ repos:
         # Run the linter
     -   id: ruff
         name: "Ruff linting"
+        files: ^(src|tests)/
         # Run the formatter
     -   id: ruff-format
         name: "Ruff formatting"
+        files: ^(src|tests)/
