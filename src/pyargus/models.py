@@ -1,8 +1,10 @@
 from __future__ import annotations
+
+import inspect
 from dataclasses import dataclass
 from datetime import datetime
+
 from iso8601 import parse_date
-import inspect
 
 
 # STATELESS is a sentinel used as an `end_time` value to explicitly indicate that an

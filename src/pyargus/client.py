@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, TypeVar, Iterator, Callable, Tuple
-from urllib.parse import urlparse, parse_qs
+from typing import Callable, Iterator, List, Tuple, TypeVar
+from urllib.parse import parse_qs, urlparse
 
 from simple_rest_client.models import Response
 
-from . import api
-from . import models
+from . import api, models
 
 __all__ = ["Client"]
 
