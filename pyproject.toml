@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "argus-api-client"
 dynamic = ["version"]
@@ -20,17 +24,22 @@ dependencies = [
     "iso8601",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-argus-server>=0.2.0",
+]
 dev = [
     "build",
     "coverage",
     "ipython",
     "isort",
     "pre-commit",
-    "pytest",
     "ruff",
     "tox",
     "twine",
+    {include-group = "test"},
 ]
 
 [tool.setuptools.dynamic]
