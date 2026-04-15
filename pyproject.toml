@@ -34,7 +34,6 @@ dev = [
     "build",
     "coverage",
     "ipython",
-    "isort",
     "pre-commit",
     "ruff",
     "tox",
@@ -54,3 +53,7 @@ line-length = 88
 extend-exclude = [
     ".egg-info",
 ]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+fixable = ["I"]
