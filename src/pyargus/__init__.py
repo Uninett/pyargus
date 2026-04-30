@@ -3,4 +3,4 @@
 from pyargus.async_client import AsyncClient as AsyncClient
 from pyargus.client import Client as Client
 
-VERSION = "0.6.0"
+VERSION = "0.7.0"
