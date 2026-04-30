@@ -43,7 +43,7 @@ class Client:
         >>> list(client.get_incidents(open=True, acked=False))
         [Incident(...), ...]
         """
-        for response, results in paginated_query(
+        for _response, results in paginated_query(
             self.api.incidents.list, params=filters
         ):
             for record in results:
@@ -60,7 +60,7 @@ class Client:
         >>> list(client.get_my_incidents(open=True, acked=False))
         [Incident(...), ...]
         """
-        for response, results in paginated_query(
+        for _response, results in paginated_query(
             self.api.incidents.list_mine, params=filters
         ):
             for record in results:

@@ -38,7 +38,7 @@ class AsyncClient:
         >>> [i async for i in client.get_incidents(open=True, acked=False)]
         [Incident(...), ...]
         """
-        async for response, results in async_paginated_query(
+        async for _response, results in async_paginated_query(
             self.api.incidents.list, params=filters
         ):
             for record in results:
@@ -55,7 +55,7 @@ class AsyncClient:
         >>> [i async for i in client.get_my_incidents(open=True, acked=False)]
         [Incident(...), ...]
         """
-        async for response, results in async_paginated_query(
+        async for _response, results in async_paginated_query(
             self.api.incidents.list_mine, params=filters
         ):
             for record in results:
