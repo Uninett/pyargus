@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Callable, Iterator, List, Tuple, TypeVar
+from typing import Callable, Iterator, List, Optional, Tuple, TypeVar
 from urllib.parse import parse_qs, urlparse
 
 from simple_rest_client.models import Response
@@ -106,8 +106,8 @@ class Client:
     def resolve_incident(
         self,
         incident: IncidentType,
-        description: str = None,
-        timestamp: datetime = None,
+        description: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> models.Event:
         """Resolves an Argus Incident
 
@@ -121,6 +121,25 @@ class Client:
             description=description, timestamp=timestamp, type="END"
         )
         return self.post_incident_event(incident, end_event)
+
+    def restart_incident(
+        self,
+        incident: IncidentType,
+        description: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> models.Event:
+        """Restarts an Argus Incident
+
+        :param description: An optional event description to post.
+        :param timestamp: When the event happened. Defaults to the current datetime.
+        :returns: A full Event description as returned from the API.
+        """
+        if timestamp is None:
+            timestamp = utcnow()
+        restart_event = models.Event(
+            description=description, timestamp=timestamp, type="RES"
+        )
+        return self.post_incident_event(incident, restart_event)
 
     def post_incident_event(
         self, incident: IncidentType, event: models.Event

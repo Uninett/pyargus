@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import AsyncIterator, Callable, List, Tuple
+from typing import AsyncIterator, Callable, List, Optional, Tuple
 
 from . import async_api, models
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
@@ -101,8 +101,8 @@ class AsyncClient:
     async def resolve_incident(
         self,
         incident: IncidentType,
-        description: str = None,
-        timestamp: datetime = None,
+        description: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> models.Event:
         """Resolves an Argus Incident
 
@@ -116,6 +116,25 @@ class AsyncClient:
             description=description, timestamp=timestamp, type="END"
         )
         return await self.post_incident_event(incident, end_event)
+
+    async def restart_incident(
+        self,
+        incident: IncidentType,
+        description: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> models.Event:
+        """Restarts an Argus Incident
+
+        :param description: An optional event description to post.
+        :param timestamp: When the event happened. Defaults to the current datetime.
+        :returns: A full Event description as returned from the API.
+        """
+        if timestamp is None:
+            timestamp = utcnow()
+        restart_event = models.Event(
+            description=description, timestamp=timestamp, type="RES"
+        )
+        return await self.post_incident_event(incident, restart_event)
 
     async def post_incident_event(
         self, incident: IncidentType, event: models.Event
