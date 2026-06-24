@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -15,7 +15,7 @@ class TestApiIntegration:
     def test_when_posting_incident_it_should_return_full_incident(self, api_client):
         post = Incident(
             description="The earth was demolished to make way for a hyperspace bypass",
-            start_time=datetime.now(),
+            start_time=datetime.now(tz=timezone.utc),
             tags={
                 "host": "earth.example.org",
             },

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable, Iterator, List, Tuple, TypeVar
 from urllib.parse import parse_qs, urlparse
 
@@ -115,7 +115,7 @@ class Client:
         :returns: A full Event description as returned from the API.
         """
         if timestamp is None:
-            timestamp = datetime.now()
+            timestamp = datetime.now(tz=timezone.utc)
         end_event = models.Event(
             description=description, timestamp=timestamp, type="END"
         )

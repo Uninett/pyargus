@@ -1,5 +1,5 @@
 from collections.abc import AsyncIterable
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 
@@ -19,7 +19,7 @@ class TestAsyncApiIntegration:
     ):
         post = Incident(
             description="The earth was demolished to make way for a hyperspace bypass",
-            start_time=datetime.now(),
+            start_time=datetime.now(tz=timezone.utc),
             tags={
                 "host": "earth.example.org",
             },
