@@ -30,9 +30,9 @@ implemented in `pyargus.models`.
 >>> for incident in c.get_incidents(open=True, acked=False):
 ...    print(incident)
 ...
-Incident(pk=4, start_time=datetime.datetime(2021, 4, 4, 16, 37, 43, 293726, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='202430', details_url='http://localhost/search/event/202430', description='uninett-gsw2 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags={'location': 'Teknobyen Innovasjonssenter', 'kundetjeneste': 'Nett_CNaaS', 'kunde': 'example.org', 'event_type': 'bgpState', 'alert_type': 'bgpDown', 'room': '100', 'organization': 'uninett.srv', 'host': 'uninett-gsw2.uninett.no'}, stateful=True, open=True, acked=False)
-Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='202429', details_url='http://localhost/search/event/202429', description='uninett-gsw1 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags={'location': 'Teknobyen Innovasjonssenter', 'kundetjeneste': 'Nett_CNaaS', 'kunde': 'example.org', 'event_type': 'bgpState', 'alert_type': 'bgpDown', 'host': 'uninett-gsw1.uninett.no', 'room': '100', 'organization': 'uninett.srv'}, stateful=True, open=True, acked=False)
-Incident(pk=2, start_time=datetime.datetime(2017, 8, 31, 14, 58, 31, 118794, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='184296', details_url='http://localhost/search/event/184296', description='Link DOWN on Gi0/3 at oldsmobile.lab (Simple is better than complex)', level=5, ticket_url='', tags={'room': '113', 'location': 'Teknobyen Innovasjonssenter', 'organization': 'uninett.testlab', 'kundetjeneste': 'Nett_CNaaS', 'kunde': 'example.org', 'event_type': 'linkState', 'alert_type': 'linkDown', 'host': 'oldsmobile.lab.uninett.no', 'interface': 'Gi0/3'}, stateful=True, open=True, acked=False)
+Incident(pk=4, start_time=datetime.datetime(2021, 4, 4, 16, 37, 43, 293726, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='202430', details_url='http://localhost/search/event/202430', description='uninett-gsw2 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags=MultiValueDict([('location', 'Teknobyen Innovasjonssenter'), ('kundetjeneste', 'Nett_CNaaS'), ('kunde', 'example.org'), ('event_type', 'bgpState'), ('alert_type', 'bgpDown'), ('room', '100'), ('organization', 'uninett.srv'), ('host', 'uninett-gsw2.uninett.no')]), stateful=True, open=True, acked=False)
+Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='202429', details_url='http://localhost/search/event/202429', description='uninett-gsw1 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags=MultiValueDict([('location', 'Teknobyen Innovasjonssenter'), ('kundetjeneste', 'Nett_CNaaS'), ('kunde', 'example.org'), ('event_type', 'bgpState'), ('alert_type', 'bgpDown'), ('host', 'uninett-gsw1.uninett.no'), ('room', '100'), ('organization', 'uninett.srv')]), stateful=True, open=True, acked=False)
+Incident(pk=2, start_time=datetime.datetime(2017, 8, 31, 14, 58, 31, 118794, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='184296', details_url='http://localhost/search/event/184296', description='Link DOWN on Gi0/3 at oldsmobile.lab (Simple is better than complex)', level=5, ticket_url='', tags=MultiValueDict([('room', '113'), ('location', 'Teknobyen Innovasjonssenter'), ('organization', 'uninett.testlab'), ('kundetjeneste', 'Nett_CNaaS'), ('kunde', 'example.org'), ('event_type', 'linkState'), ('alert_type', 'linkDown'), ('host', 'oldsmobile.lab.uninett.no'), ('interface', 'Gi0/3')]), stateful=True, open=True, acked=False)
 ```
 
 As you can see, the arguments given to `get_incidents()` are translated
@@ -54,7 +54,7 @@ Example:
 >>> for incident in c.get_my_incidents(open=True, acked=False):
 ...    print(incident)
 ...
-Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=3, name='foobar, type='nav', user=4, base_url='http://localhost/'), source_incident_id='2716057', details_url='http://localhost/search/event/2716057', description='uninett-gsw1 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags={'location': 'Teknobyen Innovasjonssenter', 'kundetjeneste': 'Nett_CNaaS', 'kunde': 'example.org', 'event_type': 'bgpState', 'alert_type': 'bgpDown', 'host': 'uninett-gsw1.uninett.no', 'room': '100', 'organization': 'uninett.srv'}, stateful=True, open=True, acked=False)
+Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=datetime.datetime(9999, 12, 31, 23, 59, 59, 999999), source=SourceSystem(pk=3, name='foobar, type='nav', user=4, base_url='http://localhost/'), source_incident_id='2716057', details_url='http://localhost/search/event/2716057', description='uninett-gsw1 BGP session with 158.38.3.112 is DOWN', level=5, ticket_url='', tags=MultiValueDict([('location', 'Teknobyen Innovasjonssenter'), ('kundetjeneste', 'Nett_CNaaS'), ('kunde', 'example.org'), ('event_type', 'bgpState'), ('alert_type', 'bgpDown'), ('host', 'uninett-gsw1.uninett.no'), ('room', '100'), ('organization', 'uninett.srv')]), stateful=True, open=True, acked=False)
 ```
 
 ### Post a new incident
@@ -72,7 +72,7 @@ Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzin
 ...     }
 ... )
 >>> c.post_incident(i)
-Incident(pk=8, start_time=datetime.datetime(2021, 4, 22, 11, 41, 53, 580947, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=None, source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='', details_url='', description='The earth was demolished to make way for a hyperspace bypass', level=5, ticket_url='', tags={'host': 'earth.example.org'}, stateful=False, open=False, acked=False)
+Incident(pk=8, start_time=datetime.datetime(2021, 4, 22, 11, 41, 53, 580947, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=None, source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='', details_url='', description='The earth was demolished to make way for a hyperspace bypass', level=5, ticket_url='', tags=MultiValueDict([('host', 'earth.example.org')]), stateful=False, open=False, acked=False)
 ```
 
 The `post_incident()` method returns the full `Incident` record, as stored in
@@ -113,9 +113,47 @@ wish you modify, and then adding values to the attributes you wish to modify:
 ...     }
 ... )
 >>> c.update_incident(i)
-Incident(pk=8, start_time=datetime.datetime(2021, 4, 22, 11, 41, 53, 580947, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=None, source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='', details_url='', description='The earth was demolished to make way for a hyperspace bypass', level=None, ticket_url='', tags={'host': 'earth.example.org', 'location': 'Milky way'}, stateful=False, open=False, acked=False)
+Incident(pk=8, start_time=datetime.datetime(2021, 4, 22, 11, 41, 53, 580947, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), end_time=None, source=SourceSystem(pk=2, name='testnav', type='nav', user=3, base_url='http://localhost/'), source_incident_id='', details_url='', description='The earth was demolished to make way for a hyperspace bypass', level=None, ticket_url='', tags=MultiValueDict([('host', 'earth.example.org'), ('location', 'Milky way')]), stateful=False, open=False, acked=False)
 
 ```
+
+### Working with multi-valued tags
+
+Argus allows an incident to carry the same tag key more than once (for example
+two different `host` values). The `tags` attribute is therefore a
+`MultiValueDict` — a `dict` subclass that keeps every value while still behaving
+like an ordinary dictionary for code that expects a single value per key.
+
+Construct it from a sequence of `(key, value)` pairs (unlike a plain `dict`,
+repeated keys are kept), or build it up with `add()`:
+
+```pycon
+>>> from pyargus.models import Incident
+>>> from pyargus.multivaluedict import MultiValueDict
+>>> tags = MultiValueDict([("host", "a.example.org"), ("host", "b.example.org")])
+>>> tags.add("location", "Milky way")
+>>> i = Incident(description="Two hosts affected", tags=tags)
+```
+
+Reading a multi-valued key through the ordinary `[]`/`get()` interface returns
+only the *last* value and emits a `DeprecationWarning`, because the other values
+are dropped silently. Use `getlist()` to retrieve them all:
+
+```pycon
+>>> tags.getlist("host")          # every value for the key
+['a.example.org', 'b.example.org']
+>>> tags["host"]                  # last value only; warns that values are dropped
+'b.example.org'
+>>> tags["location"]              # single-valued keys read normally, no warning
+'Milky way'
+>>> tags.lists()                  # all keys with all of their values
+[('host', ['a.example.org', 'b.example.org']), ('location', ['Milky way'])]
+>>> tags.allitems()               # every (key, value) pair, including repeats
+[('host', 'a.example.org'), ('host', 'b.example.org'), ('location', 'Milky way')]
+```
+
+Passing a plain `dict` as `tags` still works exactly as before, so existing code
+needs no changes.
 
 ### Stateless incidents
 
