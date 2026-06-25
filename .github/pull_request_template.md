@@ -1,6 +1,6 @@
 ## Scope and purpose
 
-Fixes #<!-- ISSUE-ID -->. <!-- Reference: https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue -->
+Fixes #<!-- ISSUE-ID -->. Dependent on #<!-- PR-ID -->. <!-- Reference: https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue -->
 
 <!-- Add a description of what this PR does and why it is needed. If a linked
 ticket fully covers it, you can omit this. -->
