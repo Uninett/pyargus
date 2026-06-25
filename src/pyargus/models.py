@@ -6,6 +6,7 @@ from datetime import datetime
 
 from iso8601 import parse_date
 
+from .multivaluedict import MultiValueDict
 from .time import LOCAL_INFINITY
 
 
@@ -51,7 +52,7 @@ class Incident:
     description: str = None
     level: int = None
     ticket_url: str = None
-    tags: dict = None
+    tags: MultiValueDict = None
     stateful: bool = None
     open: bool = None
     acked: bool = None
@@ -73,9 +74,8 @@ class Incident:
             kwargs["end_time"] = STATELESS
         kwargs["source"] = SourceSystem.from_json(kwargs["source"])
 
-        tags = [tag["tag"] for tag in kwargs["tags"]]
-        tags = dict(tag.split("=", maxsplit=1) for tag in tags)
-        kwargs["tags"] = tags
+        tag_pairs = (tag["tag"].split("=", maxsplit=1) for tag in kwargs["tags"])
+        kwargs["tags"] = MultiValueDict(tag_pairs)
 
         return cls(
             **{
@@ -102,8 +102,13 @@ class Incident:
                 if field == "source":
                     continue  # Source will be assigned by Argus when posted
                 if field == "tags":
-                    tags = ("{}={}".format(k, v) for k, v in value.items())
-                    value = [{"tag": t} for t in tags]
+                    tags = (
+                        value
+                        if isinstance(value, MultiValueDict)
+                        else MultiValueDict(value)
+                    )
+                    pairs = (f"{key}={v}" for key, v in tags.allitems())
+                    value = [{"tag": pair} for pair in pairs]
                 result[field] = value
         if "tags" not in result:  # API requires tags to be present, but it can be empty
             result["tags"] = []
