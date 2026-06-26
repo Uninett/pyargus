@@ -1,10 +1,10 @@
 from collections.abc import AsyncIterable
-from datetime import datetime, timezone
 
 import pytest
 
 from pyargus.async_client import AsyncClient
 from pyargus.models import Incident
+from pyargus.time import now as utcnow
 
 
 class TestAsyncApiIntegration:
@@ -19,7 +19,7 @@ class TestAsyncApiIntegration:
     ):
         post = Incident(
             description="The earth was demolished to make way for a hyperspace bypass",
-            start_time=datetime.now(tz=timezone.utc),
+            start_time=utcnow(),
             tags={
                 "host": "earth.example.org",
             },

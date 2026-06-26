@@ -64,11 +64,11 @@ Incident(pk=3, start_time=datetime.datetime(2021, 4, 4, 16, 32, 53, 128780, tzin
 ```pycon
 >>> from pyargus.client import Client
 >>> from pyargus.models import Incident
->>> from datetime import datetime, timezone
+>>> from pyargus.time import now as utcnow
 >>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> i = Incident(
 ...     description="The earth was demolished to make way for a hyperspace bypass",
-...     start_time=datetime.now(tz=timezone.utc),
+...     start_time=utcnow(),
 ...     tags={
 ...         "host": "earth.example.org",
 ...     }
@@ -89,9 +89,9 @@ convenience method for this operation:
 
 ```pycon
 >>> from pyargus.client import Client
->>> from datetime import datetime, timezone
+>>> from pyargus.time import now as utcnow
 >>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
->>> c.resolve_incident(incident=8, description="The demolition was cancelled", timestamp=datetime.now(tz=timezone.utc))
+>>> c.resolve_incident(incident=8, description="The demolition was cancelled", timestamp=utcnow())
 Event(pk=10, actor='testnav', description='The demolition was cancelled', incident=8, received=datetime.datetime(2021, 4, 22, 11, 47, 11, 978438, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), timestamp=datetime.datetime(2021, 4, 22, 11, 47, 11, 946076, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), type='END')
 ```
 
@@ -127,12 +127,12 @@ create stateless incidents, set the `end_time` attribute to the STATELESS
 sentinel, like so:
 
 ```pycon
-from datetime import datetime, timezone
 from pyargus.models import Incident, STATELESS
+from pyargus.time import now as utcnow
 
 stateless_incident = Incident(
     description="Something happened",
-    start_time=datetime.now(tz=timezone.utc),
+    start_time=utcnow(),
     end_time=STATELESS
 )
 ```
@@ -160,7 +160,7 @@ to try these examples interactively:
 ```pycon
 >>> from pyargus.async_client import AsyncClient
 >>> from pyargus.models import Incident
->>> from datetime import datetime, timezone
+>>> from pyargus.time import now as utcnow
 >>> c = AsyncClient(api_root_url="https://argus.example.org/api/v2", token="foobar")
 >>> async for incident in c.get_incidents(open=True, acked=False):
 ...    print(incident)
@@ -168,7 +168,7 @@ to try these examples interactively:
 Incident(pk=4, ...)
 >>> i = Incident(
 ...     description="The earth was demolished to make way for a hyperspace bypass",
-...     start_time=datetime.now(tz=timezone.utc),
+...     start_time=utcnow(),
 ...     tags={"host": "earth.example.org"},
 ... )
 >>> await c.post_incident(i)
