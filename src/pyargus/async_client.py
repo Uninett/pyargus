@@ -7,6 +7,7 @@ from typing import AsyncIterator, Callable, List, Tuple
 
 from . import async_api, models
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
+from .time import now as utcnow
 
 __all__ = ["AsyncClient"]
 
@@ -110,7 +111,7 @@ class AsyncClient:
         :returns: A full Event description as returned from the API.
         """
         if timestamp is None:
-            timestamp = datetime.now()
+            timestamp = utcnow()
         end_event = models.Event(
             description=description, timestamp=timestamp, type="END"
         )

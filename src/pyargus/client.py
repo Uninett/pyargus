@@ -9,6 +9,7 @@ from urllib.parse import parse_qs, urlparse
 from simple_rest_client.models import Response
 
 from . import api, models
+from .time import now as utcnow
 
 __all__ = ["Client"]
 
@@ -115,7 +116,7 @@ class Client:
         :returns: A full Event description as returned from the API.
         """
         if timestamp is None:
-            timestamp = datetime.now()
+            timestamp = utcnow()
         end_event = models.Event(
             description=description, timestamp=timestamp, type="END"
         )
