@@ -19,3 +19,10 @@ def test_connect_should_expose_source_heartbeat_action():
     action = client.sources.actions["heartbeat"]
     assert action["method"] == "POST"
     assert action["url"] == "incidents/sources/heartbeat/"
+
+
+def test_connect_should_expose_source_heartbeat_probe_action():
+    client = api.connect("random", "token")
+    action = client.sources.actions["heartbeat_probe"]
+    assert action["method"] == "GET"
+    assert action["url"] == "incidents/sources/heartbeat/"

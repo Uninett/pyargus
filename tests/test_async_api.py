@@ -20,3 +20,4 @@ async def test_async_api_client_with_bad_args_should_fail():
 def test_async_connect_should_expose_source_heartbeat_action():
     client = async_api.async_connect("random", "token")
     assert "heartbeat" in client.sources.actions
+    assert "heartbeat_probe" in client.sources.actions
