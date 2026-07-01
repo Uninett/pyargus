@@ -8,6 +8,7 @@ from .api import (
     IncidentAcknowledgementResource,
     IncidentEventResource,
     IncidentResource,
+    SourceSystemResource,
 )
 
 
@@ -35,6 +36,9 @@ def async_connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
         resource_class=AsyncIncidentAcknowledgementResource,
     )
     argusapi.add_resource(
+        resource_name="sources", resource_class=AsyncSourceSystemResource
+    )
+    argusapi.add_resource(
         resource_name="tokens", resource_class=AsyncExpiringTokenResource
     )
     return argusapi
@@ -50,6 +54,10 @@ class AsyncIncidentEventResource(AsyncResource):
 
 class AsyncIncidentAcknowledgementResource(AsyncResource):
     actions = IncidentAcknowledgementResource.actions
+
+
+class AsyncSourceSystemResource(AsyncResource):
+    actions = SourceSystemResource.actions
 
 
 class AsyncExpiringTokenResource(AsyncResource):
