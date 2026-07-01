@@ -95,6 +95,20 @@ convenience method for this operation:
 Event(pk=10, actor='testnav', description='The demolition was cancelled', incident=8, received=datetime.datetime(2021, 4, 22, 11, 47, 11, 978438, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), timestamp=datetime.datetime(2021, 4, 22, 11, 47, 11, 946076, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), type='END')
 ```
 
+### Restart an existing incident
+
+Incidents are restarted by posting a *RES* type event to an incident's event
+log, with an optional timestamp. The `Client` class provides the follow
+convenience method for this operation:
+
+```pycon
+>>> from pyargus.client import Client
+>>> from pyargus.time import now as utcnow
+>>> c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
+>>> c.restart_incident(incident=8, description="The demolition was restarted", timestamp=utcnow())
+Event(pk=10, actor='testnav', description='The demolition was restarted', incident=8, received=datetime.datetime(2021, 4, 22, 11, 47, 11, 978438, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), timestamp=datetime.datetime(2021, 4, 22, 11, 47, 11, 946076, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), '+02:00')), type='RES')
+```
+
 ### Modify an existing incident
 
 Argus does not allow modification of most incident attributes, but things
