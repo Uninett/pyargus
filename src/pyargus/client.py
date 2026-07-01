@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Callable, Iterator, List, Optional, Tuple, TypeVar
 from urllib.parse import parse_qs, urlparse
 
+from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 from simple_rest_client.models import Response
 
 from . import api, models
@@ -153,6 +154,28 @@ class Client:
         response = self.api.events.create(incident_pk, body=body)
         return models.Event.from_json(response.body)
 
+    def supports_heartbeat(self) -> bool:
+        """Detects whether the connected Argus server provides the heartbeat endpoint.
+
+        Probes the endpoint with a GET request: a server that has it answers with
+        a non-404 status (currently 405, as the endpoint only accepts POST), while
+        a server too old to provide it answers with 404. Use this to decide whether
+        to call `send_heartbeat()` at all.
+
+        :returns: True if the server provides the heartbeat endpoint, else False.
+        :raises AuthError: if the token is missing or invalid (HTTP 401); support
+            cannot be determined without authenticating.
+        """
+        try:
+            self.api.sources.heartbeat_probe()
+            return True  # 2xx: the endpoint exists
+        except NotFoundError:
+            return False  # 404: the endpoint is absent (older Argus)
+        except AuthError:
+            raise  # 401: cannot determine support without valid credentials
+        except ClientError:
+            return True  # e.g. 405: the endpoint exists but GET is not allowed
+
     def send_heartbeat(self) -> None:
         """Sends a heartbeat to Argus to signal that this source system is alive.
 
@@ -166,7 +189,9 @@ class Client:
         underlying HTTP library (for example `AuthError` if the token does not
         belong to a source system). Note that an Argus server too old to provide
         this endpoint typically answers with a 403 as well, which is
-        indistinguishable from a genuine authentication failure.
+        indistinguishable from a genuine authentication failure; use
+        `supports_heartbeat()` to detect endpoint support up front rather than
+        inferring it from this method's failure.
         """
         self.api.sources.heartbeat()
 
