@@ -165,6 +165,50 @@ c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token
 # secrets file so that it is not lost on program exit
 ```
 
+### Send a heartbeat
+
+A source system with no incidents to report looks exactly like one that has
+crashed. Every glue service should therefore send a *heartbeat* on a regular
+schedule to prove it is still alive. A heartbeat updates the source system's
+`last_seen` timestamp on the server without posting an incident, so Argus can
+tell a healthy-but-quiet source apart from a dead one.
+
+```python
+c.send_heartbeat()
+```
+
+The method returns `None` on success. On failure it raises an exception from
+`simple_rest_client`, the HTTP client library that pyargus is built on; these
+exceptions are defined in its `simple_rest_client.exceptions` module (for
+example, `AuthError` for a `401` or `403` response).
+
+#### Detecting whether the server supports heartbeats
+
+The heartbeat endpoint requires an Argus server new enough to provide it.
+Older servers don't fail cleanly on a `POST` — they reject it with a `403` that
+is indistinguishable from an authentication error — so don't infer support from
+the `send_heartbeat()` outcome. Instead, probe up front with
+`supports_heartbeat()`, which issues a `GET` and returns whether the endpoint is
+present:
+
+```python
+if c.supports_heartbeat():
+    c.send_heartbeat()
+```
+
+A long-running glue service can check once at startup and decide whether to
+bother sending heartbeats at all:
+
+```python
+c = Client(api_root_url="https://argus.example.org/api/v2", token="foobar")
+heartbeats_enabled = c.supports_heartbeat()
+while running:
+    do_work()
+    if heartbeats_enabled:
+        c.send_heartbeat()
+    sleep(interval)
+```
+
 ## Async usage
 
 An `AsyncClient` is available for use in asyncio-based applications. It mirrors
@@ -187,6 +231,9 @@ Incident(pk=4, ...)
 ... )
 >>> await c.post_incident(i)
 Incident(pk=8, ...)
+>>> if await c.supports_heartbeat():
+...     await c.send_heartbeat()
+...
 ```
 
 ## BUGS
