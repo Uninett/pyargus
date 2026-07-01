@@ -22,6 +22,7 @@ def connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
     argusapi.add_resource(
         resource_name="acknowledgements", resource_class=IncidentAcknowledgementResource
     )
+    argusapi.add_resource(resource_name="sources", resource_class=SourceSystemResource)
     argusapi.add_resource(resource_name="tokens", resource_class=ExpiringTokenResource)
     return argusapi
 
@@ -52,6 +53,18 @@ class IncidentAcknowledgementResource(Resource):
         "list": {"method": "GET", "url": "incidents/{}/acks"},
         "create": {"method": "POST", "url": "incidents/{}/acks"},
         "retrieve": {"method": "GET", "url": "incidents/{}/acks/{}"},
+    }
+
+
+class SourceSystemResource(Resource):
+    actions = {
+        # The Argus source system endpoints are served under the incident app,
+        # hence the "incidents/" URL prefix.
+        "heartbeat": {"method": "POST", "url": "incidents/sources/heartbeat/"},
+        # A GET against the same URL is used only to probe for endpoint support:
+        # the endpoint accepts POST only, so it answers non-404 (405 today) when
+        # present and 404 when absent on older servers. See supports_heartbeat().
+        "heartbeat_probe": {"method": "GET", "url": "incidents/sources/heartbeat/"},
     }
 
 
