@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Made default timestamps timezone-aware.
+- Made infinity timestamps timezone-aware.
 
 ## [0.7.0] - 2026-04-30
 
