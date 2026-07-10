@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added helper functions for restarting an incident.
+- Added `Client.send_heartbeat()` and `AsyncClient.send_heartbeat()` for sending a source system heartbeat to Argus via the `sources/heartbeat/` endpoint.
+- Added `Client.supports_heartbeat()` and `AsyncClient.supports_heartbeat()` for detecting whether the connected Argus server provides the heartbeat endpoint.
 
 ### Changed
 - Made default timestamps timezone-aware.

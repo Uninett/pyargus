@@ -12,3 +12,17 @@ def test_api_client_with_bad_args_should_fail():
     client = api.connect("random", "token")
     with pytest.raises(Exception):
         client.incidents.list_open_unacked()
+
+
+def test_connect_should_expose_source_heartbeat_action():
+    client = api.connect("random", "token")
+    action = client.sources.actions["heartbeat"]
+    assert action["method"] == "POST"
+    assert action["url"] == "incidents/sources/heartbeat/"
+
+
+def test_connect_should_expose_source_heartbeat_probe_action():
+    client = api.connect("random", "token")
+    action = client.sources.actions["heartbeat_probe"]
+    assert action["method"] == "GET"
+    assert action["url"] == "incidents/sources/heartbeat/"
