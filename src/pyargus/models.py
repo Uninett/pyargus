@@ -6,6 +6,8 @@ from datetime import datetime
 
 from iso8601 import parse_date
 
+from .time import LOCAL_INFINITY
+
 
 # STATELESS is a sentinel used as an `end_time` value to explicitly indicate that an
 # incident is in fact stateless. To the Argus API, this is represented by a null/None
@@ -65,7 +67,7 @@ class Incident:
             kwargs["end_time"] = (
                 parse_date(kwargs["end_time"])
                 if kwargs["end_time"] != "infinity"
-                else datetime.max
+                else LOCAL_INFINITY
             )
         else:
             kwargs["end_time"] = STATELESS
@@ -94,7 +96,7 @@ class Incident:
                 if field == "start_time" and isinstance(value, datetime):
                     value = value.isoformat()
                 if field == "end_time" and isinstance(value, datetime):
-                    value = value.isoformat() if value != datetime.max else "infinity"
+                    value = value.isoformat() if value != LOCAL_INFINITY else "infinity"
                 if field == "end_time" and value is STATELESS:
                     value = None
                 if field == "source":
