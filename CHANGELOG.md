@@ -5,18 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.8.0] - 2026-09-02
 
 ### Added
-- Added helper functions for restarting an incident.
+
+- Added helper functions for restarting an incident (i.e. Argus now allows a source system to restart/reopen an incident it has already closed).
 - Added `Client.send_heartbeat()` and `AsyncClient.send_heartbeat()` for sending a source system heartbeat to Argus via the `sources/heartbeat/` endpoint.
 - Added `Client.supports_heartbeat()` and `AsyncClient.supports_heartbeat()` for detecting whether the connected Argus server provides the heartbeat endpoint.
 
 ### Changed
+
 - Made default timestamps timezone-aware.
-- Made infinity timestamps timezone-aware.
 
 ### Fixed
+
 - Incident tags with repeated keys are no longer silently collapsed. `Incident.tags` is now a `MultiValueDict` that preserves every value per key, both when reading incidents from Argus and when posting them (fixes #52).
 
 ## [0.7.0] - 2026-04-30
