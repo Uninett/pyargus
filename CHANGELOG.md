@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Made default timestamps timezone-aware.
 - Made infinity timestamps timezone-aware.
 
+### Fixed
+- Incident tags with repeated keys are no longer silently collapsed. `Incident.tags` is now a `MultiValueDict` that preserves every value per key, both when reading incidents from Argus and when posting them (fixes #52).
+
 ## [0.7.0] - 2026-04-30
 
 ### Removed
