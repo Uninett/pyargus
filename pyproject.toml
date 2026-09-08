@@ -23,6 +23,11 @@ dependencies = [
     "iso8601",
 ]
 
+[project.urls]
+GitHub = "https://github.com/Uninett/pyargus"
+Changelog = "https://github.com/Uninett/pyargus/blob/master/CHANGELOG.md"
+Argus = "https://network.geant.org/argus/"
+
 [dependency-groups]
 test = [
     "pytest",
