@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Explicit support for Python 3.9 and 3.10 was dropped. The minimum supported version is now Python 3.11.
+
 ### Added
 
 - Python 3.14 added to test matrix for compatibility testing.
