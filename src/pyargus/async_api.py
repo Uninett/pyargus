@@ -8,11 +8,14 @@ from .api import (
     IncidentAcknowledgementResource,
     IncidentEventResource,
     IncidentResource,
+    PublicExpiringTokenResource,
     SourceSystemResource,
 )
 
+TIMEOUT = 2.0
 
-def async_connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
+
+def async_connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> API:
     """Connects to an Argus API instance using async resources.
 
     :returns: A connected simple_rest_client API object with async resources
@@ -44,6 +47,29 @@ def async_connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
     return argusapi
 
 
+def async_public_connect(
+    api_root_url: str, headers: dict | None = None, timeout: float = TIMEOUT
+) -> API:
+    """Connects to an Argus public API instance using async resources.
+
+    :returns: A connected simple_rest_client API object for public endpoints
+    with async resources
+    """
+    if headers is None:
+        headers = {}
+    argusapi = API(
+        api_root_url=api_root_url,
+        headers=headers,
+        timeout=timeout,
+        json_encode_body=True,
+        append_slash=True,
+    )
+    argusapi.add_resource(
+        resource_name="tokens", resource_class=AsyncPublicExpiringTokenResource
+    )
+    return argusapi
+
+
 class AsyncIncidentResource(AsyncResource):
     actions = IncidentResource.actions
 
@@ -62,3 +88,7 @@ class AsyncSourceSystemResource(AsyncResource):
 
 class AsyncExpiringTokenResource(AsyncResource):
     actions = ExpiringTokenResource.actions
+
+
+class AsyncPublicExpiringTokenResource(AsyncResource):
+    actions = PublicExpiringTokenResource.actions

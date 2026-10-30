@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Python 3.14 added to test matrix for compatibility testing.
+- Support for getting a token by logging in with username and password.
 
 ## [0.8.0] - 2026-09-02
 

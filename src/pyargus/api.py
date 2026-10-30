@@ -3,8 +3,10 @@
 from simple_rest_client.api import API
 from simple_rest_client.resource import Resource
 
+TIMEOUT = 2.0
 
-def connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
+
+def connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> API:
     """Connects to an Argus API instance.
 
     :returns: A connected simple_rest_client API object
@@ -24,6 +26,28 @@ def connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
     )
     argusapi.add_resource(resource_name="sources", resource_class=SourceSystemResource)
     argusapi.add_resource(resource_name="tokens", resource_class=ExpiringTokenResource)
+    return argusapi
+
+
+def public_connect(
+    api_root_url: str, headers: dict | None = None, timeout: float = TIMEOUT
+) -> API:
+    """Connects to an Argus public API instance.
+
+    :returns: A connected simple_rest_client API object for public endpoints
+    """
+    if headers is None:
+        headers = {}
+    argusapi = API(
+        api_root_url=api_root_url,
+        headers=headers,
+        timeout=timeout,
+        json_encode_body=True,
+        append_slash=True,
+    )
+    argusapi.add_resource(
+        resource_name="tokens", resource_class=PublicExpiringTokenResource
+    )
     return argusapi
 
 
@@ -71,4 +95,13 @@ class SourceSystemResource(Resource):
 class ExpiringTokenResource(Resource):
     actions = {
         "refresh": {"method": "POST", "url": "auth/token/login/"},
+    }
+
+
+# publicly accessible endpoints
+
+
+class PublicExpiringTokenResource(Resource):
+    actions = {
+        "login": {"method": "POST", "url": "auth/token/login/"},
     }
