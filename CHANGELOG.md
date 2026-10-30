@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `refresh_token()` no longer crashes with a `KeyError`.
+
 ### Removed
 
 - Explicit support for Python 3.9 and 3.10 was dropped. The minimum supported version is now Python 3.11.
 
 ### Changed
 
+- The field `expiration` on `ExpiringToken` was renamed to `expiry`. Since `client.refresh_token`, the sole user of `ExpiringToken`, has never worked, this change should not affect any current systems.
 - The `pytest-argus-server` requirement was raised to `>=0.4.0`, the first release that allows consumers to use pytest 8 or newer. This only affects the test dependencies, not the published client library.
 
 ### Added

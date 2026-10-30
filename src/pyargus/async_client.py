@@ -194,12 +194,9 @@ class AsyncClient:
     async def refresh_token(self) -> models.ExpiringToken:
         """Post w/o body to get a new token and its expiration timestamp
 
-        It will be necessary to re-initialize the client as the old token has
-        been rendered invalid.
-
-        Store the new token (and the returned expiration datetime) where your
-        program can load it on next run: environment variable, config file or
-        secrets file.
+        Store the new token (and the returned expiration datetime if any) where
+        your program can load it on next run: environment variable, config file
+        or secrets file.
         """
         response = await self.api.tokens.refresh()
         return models.ExpiringToken.from_json(response.body)
