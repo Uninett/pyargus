@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A bug leading to a crash when trying to to run `refresh_token` has been fixed.
+
 ### Removed
 
 - Explicit support for Python 3.9 and 3.10 was dropped. The minimum supported version is now Python 3.11.

@@ -188,7 +188,7 @@ class ExpiringToken:
     @classmethod
     def from_json(cls, data: dict) -> ExpiringToken:
         kwargs = {
-            "expiration": parse_date(data["expiration"]),
-            "token": parse_date(data["token"]),
+            "expiration": parse_date(data["expiry"]),
+            "token": data["token"],
         }
         return cls(**kwargs)
