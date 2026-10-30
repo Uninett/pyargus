@@ -16,6 +16,7 @@ __all__ = ["Client"]
 
 
 IncidentType = TypeVar("IncidentType", int, models.Incident)
+TIMEOUT = 2.0
 
 
 class Client:
@@ -24,11 +25,31 @@ class Client:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = 2.0):
+    def __init__(self, api_root_url: str, token: str, timeout: float = TIMEOUT):
         self.api = api.connect(api_root_url, token, timeout)
+        self.token = token
+        self.token_expires = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
+
+    @classmethod
+    def login(
+        cls, api_root_url: str, username: str, password: str, timeout: float = TIMEOUT
+    ):
+        """Factory to connect to argus with username and password
+
+        This results in a fresh token that might be useful to store somewhere.
+        """
+        public_api = api.public_connect(api_root_url, timeout=timeout)
+        body = {
+            "username": username,
+            "password": password,
+        }
+        response = public_api.tokens.login(body=body, params={}, headers={})
+        private_api = cls(api_root_url, response.body["token"], timeout)
+        private_api.token_expires = response.body["expiry"]
+        return private_api
 
     def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""

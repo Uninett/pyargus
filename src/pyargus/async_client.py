@@ -14,17 +14,40 @@ from .time import now as utcnow
 __all__ = ["AsyncClient"]
 
 
+TIMEOUT = 2.0
+
+
 class AsyncClient:
     """Async high-level Argus API client.
 
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = 2.0):
+    def __init__(self, api_root_url: str, token: str, timeout: float = TIMEOUT):
         self.api = async_api.async_connect(api_root_url, token, timeout)
+        self.token = token
+        self.token_expires = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
+
+    @classmethod
+    def login(
+        cls, api_root_url: str, username: str, password: str, timeout: float = TIMEOUT
+    ):
+        """Factory to connect to argus with username and password
+
+        This results in a fresh token that might be useful to store somewhere.
+        """
+        public_api = async_api.public_connect(api_root_url, timeout=timeout)
+        body = {
+            "username": username,
+            "password": password,
+        }
+        response = public_api.tokens.login(body=body, params={}, headers={})
+        private_api = cls(api_root_url, response.body["token"], timeout)
+        private_api.token_expires = response.body["expiry"]
+        return private_api
 
     async def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""
