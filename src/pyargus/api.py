@@ -94,6 +94,7 @@ class SourceSystemResource(Resource):
 
 class ExpiringTokenResource(Resource):
     actions = {
+        # When accessed with a token, takes an empty JSON body or nothing
         "refresh": {"method": "POST", "url": "auth/token/login/"},
     }
 
@@ -103,5 +104,7 @@ class ExpiringTokenResource(Resource):
 
 class PublicExpiringTokenResource(Resource):
     actions = {
+        # When accessed without a token, takes a JSON body with username/password:
+        # { "username": "somestring", "password": "someothernonencryptedstring" }
         "login": {"method": "POST", "url": "auth/token/login/"},
     }
