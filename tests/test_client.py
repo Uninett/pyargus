@@ -94,6 +94,33 @@ class TestSupportsHeartbeat:
         return client
 
 
+# unit
+class TestRefreshToken:
+    def test_when_called_it_should_post_to_the_tokens_refresh_action(self):
+        dummy_body = {
+            "token": "vfbgnhuhgvfhnj",
+            "expiry": "1970-01-01T00:00:00+01:00",
+        }
+        mock = MagicMock()
+        mock.body = dummy_body
+        client = self._client_with_probe(return_value=mock)
+        result = client.refresh_token()
+        client.api.tokens.refresh.assert_called_once_with()
+        assert result
+
+    def test_when_credentials_are_invalid_it_should_raise(self):
+        client = self._client_with_probe(side_effect=AuthError("401", None))
+        with pytest.raises(AuthError):
+            client.refresh_token()
+
+    def _client_with_probe(self, side_effect=None, return_value=None):
+        client = Client("https://argus.example.org/api/v2", "token")
+        client.api.tokens.refresh = MagicMock(
+            side_effect=side_effect, return_value=return_value
+        )
+        return client
+
+
 @pytest.fixture
 def api_client(argus_api_url, argus_source_system_token):
     return Client(argus_api_url, argus_source_system_token)
