@@ -11,6 +11,7 @@ from .api import (
     IncidentResource,
     PublicExpiringTokenResource,
     SourceSystemResource,
+    configure_api_object,
 )
 
 
@@ -22,12 +23,10 @@ def async_connect(
     :returns: A connected simple_rest_client API object with async resources
     """
     headers = {"Authorization": "Token " + token}
-    argusapi = API(
+    argusapi = configure_api_object(
         api_root_url=api_root_url,
         headers=headers,
         timeout=timeout,
-        json_encode_body=True,
-        append_slash=True,
     )
     argusapi.add_resource(
         resource_name="incidents", resource_class=AsyncIncidentResource
@@ -48,22 +47,15 @@ def async_connect(
     return argusapi
 
 
-def async_public_connect(
-    api_root_url: str, headers: dict | None = None, timeout: float = DEFAULT_TIMEOUT
-) -> API:
+def async_public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
     """Connects to an Argus public API instance using async resources.
 
     :returns: A connected simple_rest_client API object for public endpoints
     with async resources
     """
-    if headers is None:
-        headers = {}
-    argusapi = API(
+    argusapi = configure_api_object(
         api_root_url=api_root_url,
-        headers=headers,
         timeout=timeout,
-        json_encode_body=True,
-        append_slash=True,
     )
     argusapi.add_resource(
         resource_name="tokens", resource_class=AsyncPublicExpiringTokenResource

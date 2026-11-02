@@ -12,12 +12,10 @@ def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> 
     :returns: A connected simple_rest_client API object
     """
     headers = {"Authorization": "Token " + token}
-    argusapi = API(
+    argusapi = configure_api_object(
         api_root_url=api_root_url,
         headers=headers,
         timeout=timeout,
-        json_encode_body=True,
-        append_slash=True,
     )
     argusapi.add_resource(resource_name="incidents", resource_class=IncidentResource)
     argusapi.add_resource(resource_name="events", resource_class=IncidentEventResource)
@@ -29,26 +27,37 @@ def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> 
     return argusapi
 
 
-def public_connect(
-    api_root_url: str, headers: dict | None = None, timeout: float = DEFAULT_TIMEOUT
-) -> API:
+def public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
     """Connects to an Argus public API instance.
 
     :returns: A connected simple_rest_client API object for public endpoints
     """
-    if headers is None:
-        headers = {}
-    argusapi = API(
+    argusapi = configure_api_object(
         api_root_url=api_root_url,
-        headers=headers,
         timeout=timeout,
-        json_encode_body=True,
-        append_slash=True,
     )
     argusapi.add_resource(
         resource_name="tokens", resource_class=PublicExpiringTokenResource
     )
     return argusapi
+
+
+def configure_api_object(
+    api_root_url: str,
+    headers: dict | None = None,
+    timeout: float = DEFAULT_TIMEOUT,
+    json_encode_body: bool = True,
+    append_slash: bool = True,
+):
+    if headers is None:
+        headers = {}
+    return API(
+        api_root_url=api_root_url,
+        headers=headers,
+        timeout=timeout,
+        json_encode_body=json_encode_body,
+        append_slash=append_slash,
+    )
 
 
 class IncidentResource(Resource):
