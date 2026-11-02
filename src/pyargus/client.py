@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Callable, Iterator, List, Optional, Tuple, TypeVar
+from typing import Callable, Iterator, List, Optional, Self, Tuple, TypeVar
 from urllib.parse import parse_qs, urlparse
 
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 from simple_rest_client.models import Response
 
 from . import api, models
+from .api import DEFAULT_TIMEOUT
 from .time import now as utcnow
 
 __all__ = ["Client"]
 
 
 IncidentType = TypeVar("IncidentType", int, models.Incident)
-TIMEOUT = 2.0
 
 
 def login(
@@ -43,7 +43,7 @@ class Client:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = TIMEOUT):
+    def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
         self.api = api.connect(api_root_url, token, timeout)
 
     def __repr__(self):
@@ -51,7 +51,11 @@ class Client:
 
     @classmethod
     def login(
-        cls, api_root_url: str, username: str, password: str, timeout: float = TIMEOUT
+        cls,
+        api_root_url: str,
+        username: str,
+        password: str,
+        timeout: float = DEFAULT_TIMEOUT,
     ) -> Self:
         """Factory to connect to argus with username and password
 

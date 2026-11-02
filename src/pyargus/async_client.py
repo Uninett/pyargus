@@ -3,18 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import AsyncIterator, Callable, List, Optional, Tuple
+from typing import AsyncIterator, Callable, List, Optional, Self, Tuple
 
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from . import async_api, models
+from .api import DEFAULT_TIMEOUT
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
 from .time import now as utcnow
 
 __all__ = ["AsyncClient"]
-
-
-TIMEOUT = 2.0
 
 
 class AsyncClient:
@@ -23,7 +21,7 @@ class AsyncClient:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = TIMEOUT):
+    def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
         self.api = async_api.async_connect(api_root_url, token, timeout)
         self.token = token
         self.token_expires = None
@@ -33,7 +31,11 @@ class AsyncClient:
 
     @classmethod
     async def login(
-        cls, api_root_url: str, username: str, password: str, timeout: float = TIMEOUT
+        cls,
+        api_root_url: str,
+        username: str,
+        password: str,
+        timeout: float = DEFAULT_TIMEOUT,
     ) -> Self:
         """Factory to connect to argus with username and password
 

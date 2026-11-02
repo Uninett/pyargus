@@ -4,6 +4,7 @@ from simple_rest_client.api import API
 from simple_rest_client.resource import AsyncResource
 
 from .api import (
+    DEFAULT_TIMEOUT,
     ExpiringTokenResource,
     IncidentAcknowledgementResource,
     IncidentEventResource,
@@ -12,10 +13,10 @@ from .api import (
     SourceSystemResource,
 )
 
-TIMEOUT = 2.0
 
-
-def async_connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> API:
+def async_connect(
+    api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT
+) -> API:
     """Connects to an Argus API instance using async resources.
 
     :returns: A connected simple_rest_client API object with async resources
@@ -48,7 +49,7 @@ def async_connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> AP
 
 
 def async_public_connect(
-    api_root_url: str, headers: dict | None = None, timeout: float = TIMEOUT
+    api_root_url: str, headers: dict | None = None, timeout: float = DEFAULT_TIMEOUT
 ) -> API:
     """Connects to an Argus public API instance using async resources.
 

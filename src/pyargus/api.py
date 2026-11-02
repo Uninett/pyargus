@@ -3,10 +3,10 @@
 from simple_rest_client.api import API
 from simple_rest_client.resource import Resource
 
-TIMEOUT = 2.0
+DEFAULT_TIMEOUT = 2.0
 
 
-def connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> API:
+def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> API:
     """Connects to an Argus API instance.
 
     :returns: A connected simple_rest_client API object
@@ -30,7 +30,7 @@ def connect(api_root_url: str, token: str, timeout: float = TIMEOUT) -> API:
 
 
 def public_connect(
-    api_root_url: str, headers: dict | None = None, timeout: float = TIMEOUT
+    api_root_url: str, headers: dict | None = None, timeout: float = DEFAULT_TIMEOUT
 ) -> API:
     """Connects to an Argus public API instance.
 
