@@ -1,4 +1,6 @@
-from pyargus.models import Incident
+from datetime import datetime
+
+from pyargus.models import ExpiringToken, Incident
 from pyargus.multivaluedict import MultiValueDict
 
 
@@ -60,3 +62,27 @@ class TestIncidentTagRoundTrip:
         data = make_api_incident(original.to_json()["tags"])
         restored = Incident.from_json(data)
         assert restored.tags.getlist("host") == ["a", "b"]
+
+
+class TestExpiringToken:
+    def test_when_parsing_response_with_expiry_set_should_return_a_tokenobj_with_expiry_set(
+        self,
+    ):
+        dummy_json = {
+            "token": "vfbgnhuhgvfhnj",
+            "expiry": "1970-01-01T00:00:00+01:00",
+        }
+        tokenobj = ExpiringToken.from_json(dummy_json)
+        assert tokenobj.token == dummy_json["token"]
+        assert tokenobj.expiry == datetime.fromisoformat(dummy_json["expiry"])
+
+    def test_when_parsing_response_with_no_expiry_should_return_a_tokenobj_with_expiry_set_to_none(
+        self,
+    ):
+        dummy_json = {
+            "token": "vfbgnhuhgvfhnj",
+            "expiry": None,
+        }
+        tokenobj = ExpiringToken.from_json(dummy_json)
+        assert tokenobj.token == dummy_json["token"]
+        assert tokenobj.expiry is None

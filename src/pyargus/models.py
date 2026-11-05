@@ -182,13 +182,13 @@ class Acknowledgement:
 class ExpiringToken:
     """Class for describing the authentication token"""
 
-    expiration: datetime
-    token: int
+    token: str
+    expiry: datetime | None = None
 
     @classmethod
     def from_json(cls, data: dict) -> ExpiringToken:
         kwargs = {
-            "expiration": parse_date(data["expiration"]),
-            "token": parse_date(data["token"]),
+            "token": data["token"],
+            "expiry": parse_date(data["expiry"]) if data["expiry"] else None,
         }
         return cls(**kwargs)
