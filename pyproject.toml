@@ -21,6 +21,8 @@ classifiers = [
 dependencies = [
     "simple_rest_client",
     "iso8601",
+    # needed by simple_rest_client, useful for as yet unsupported endpoints
+    "httpx",
 ]
 
 [project.urls]
