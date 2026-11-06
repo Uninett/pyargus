@@ -1,35 +1,39 @@
-import argparse
 import re
 import sys
+from argparse import ArgumentParser, Namespace
+from enum import IntEnum
 
 import httpx
 from simple_rest_client.exceptions import AuthError
 
 from .client import Client
 
-# Explicit is better than implicit, especially in opposite land
-NoError = 0
-Error = 1
-
 SERVER_URL_RE = re.compile(r"^(?P<url>.*/)(?P<api_version>v\d+)/?$")
 # Map up the subparsers so it is easy to get their help texts
 PARSER_MAP = {}
+
+
+# Explicit is better than implicit, especially in opposite land
+class ShellExitCode(IntEnum):
+    NoError = 0  # None is also treated as NoError
+    Error = 1
+    NetworkError = 2
 
 
 class ServerError(Exception):
     pass
 
 
-def main():
+def main() -> ShellExitCode:
     parser = create_argparser()
     args = parser.parse_args()
     return args.func(args)
 
 
-def create_argparser():
+def create_argparser() -> ArgumentParser:
     global PARSER_MAP
 
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         description="Command line argus glue service",
     )
     parser.add_argument(
@@ -109,28 +113,31 @@ def create_argparser():
     return parser
 
 
-def handle_global_args(args):
+def handle_global_args(args: Namespace) -> ShellExitCode:
     if args.verify_argus_server:
         error = check_requisites(args.server_url, args.token)
         return error if error else do_verify_argus_server(args.server_url, args.verbose)
+    return ShellExitCode.NoError
 
 
-def do_verify_argus_server(url, verbose: bool = False):
+def do_verify_argus_server(url: str, verbose: bool = False) -> ShellExitCode:
     try:
         version = find_server_version(url)
         if verbose:
             print("Version:", version)
-        return NoError
+        return ShellExitCode.NoError
     except ServerError as e:
         msg = f"({e})" if str(e) else ""
         print(f"No Argus server at {url}", msg, file=sys.stderr)
-        return Error
+        return ShellExitCode.NetworkError
+
+    return ShellExitCode.NoError
 
 
-def handle_heartbeat(args):
+def handle_heartbeat(args: Namespace) -> ShellExitCode:
     error = check_requisites(args.server_url, args.token)
     if error:
-        return Error
+        return ShellExitCode.Error
 
     if args.supported:
         return do_heartbeat_supported(args.server_url, args.token)
@@ -141,22 +148,22 @@ def handle_heartbeat(args):
     return PARSER_MAP[args.command].print_help()
 
 
-def do_heartbeat_supported(url, token):
+def do_heartbeat_supported(url: str, token: str) -> ShellExitCode:
     client = Client(url, token)
     try:
         result = client.supports_heartbeat()
     except AuthError as e:
         print(f"Token: FAILED ({e})", file=sys.stderr)
-        return Error
+        return ShellExitCode.Error
     except Exception as e:
         print(f"Argus: FAILED ({e})", file=sys.stderr)
-        return Error
+        return ShellExitCode.Error
     pretty_supported = "on" if result else "off"
     print(f"Heartbeat support for Argus at {url}:", pretty_supported)
-    return NoError
+    return ShellExitCode.NoError
 
 
-def do_heartbeat_send(url, token):
+def do_heartbeat_send(url: str, token: str) -> ShellExitCode:
     client = Client(url, token)
     try:
         client.send_heartbeat()
@@ -166,14 +173,14 @@ def do_heartbeat_send(url, token):
             print(f"Heartbeat: FAILED ({e})", file=sys.stderr)
         else:
             print(f"Heartbeat not supported for Argus at {url}", file=sys.stderr)
-        return Error
-    return NoError
+        return ShellExitCode.Error
+    return ShellExitCode.NoError
 
 
-def handle_token(args):
+def handle_token(args: Namespace) -> ShellExitCode:
     error = check_requisites(args.server_url, args.token)
     if error:
-        return Error
+        return ShellExitCode.Error
 
     if args.refresh:
         return do_token_refresh(args.server_url, args.token, args.verbose)
@@ -181,42 +188,53 @@ def handle_token(args):
     return PARSER_MAP[args.command].print_help()
 
 
-def do_token_refresh(url, token, verbose: bool = False):
+def do_token_refresh(url: str, token: str, verbose: bool = False) -> ShellExitCode:
     client = Client(url, token)
     try:
         tokenobj = client.refresh_token()
     except AuthError as e:
         msg = f"({e})" if verbose else ""
         print("Token refresh FAILED", msg, file=sys.stderr)
-        return Error
+        return ShellExitCode.Error
 
     print("Token:", tokenobj.token)
     print("Expiry:", tokenobj.expiry.isoformat() if tokenobj.expiry else "Never")
-    return NoError
+    return ShellExitCode.NoError
 
 
 # helpers
 
 
-def check_requisites(url: str, token: str):
+def check_requisites(url: str, token: str) -> ShellExitCode:
+    """Check if url and token are set and usable
+
+    Does not return early so that all errores can be found in one go.
+    """
     errors = False
     if not token:
         errors = True
         print("Token has not been given", file=sys.stderr)
+    if check_server_requisites(url) != ShellExitCode.NoError:
+        errors = True
+
+    if errors:
+        return ShellExitCode.Error
+    return ShellExitCode.NoError
+
+
+def check_server_requisites(url: str) -> ShellExitCode:
     matchobj = SERVER_URL_RE.search(url or "")
     if matchobj is None:
-        errors = True
         print(
             f'Url "{url}" is of the wrong format, maybe missing version?',
             file=sys.stderr,
         )
-    if errors:
-        return Error
-    return NoError
+        return ShellExitCode.Error
+    return ShellExitCode.NoError
 
 
 # For later: if we add proper support for "/api/" we can simplify this
-def find_server_version(url):
+def find_server_version(url) -> str:
     """Fetch server version from the Argus metadata endpoint.
 
     This endpoint is not versioned.
