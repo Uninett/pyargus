@@ -6,7 +6,7 @@ from enum import IntEnum
 import httpx
 from simple_rest_client.exceptions import AuthError
 
-from .client import Client
+from .client import Client, login
 
 SERVER_URL_RE = re.compile(r"^(?P<url>.*/)(?P<api_version>v\d+)/?$")
 # Map up the subparsers so it is easy to get their help texts
@@ -70,6 +70,22 @@ def create_argparser() -> ArgumentParser:
         help="subcommand help",
     )
 
+    # auth
+    auth_parser = subparsers.add_parser(
+        "auth",
+        help="Send a auth",
+    )
+    auth_parser.set_defaults(func=handle_auth)
+
+    auth_parser.add_argument(
+        "username",
+        help="Username to get a token for",
+    )
+    auth_parser.add_argument(
+        "password",
+        help="Password to get a token for",
+    )
+
     # heartbeat
     heartbeat_parser = subparsers.add_parser(
         "heartbeat",
@@ -131,6 +147,17 @@ def do_verify_argus_server(url: str, verbose: bool = False) -> ShellExitCode:
         print(f"No Argus server at {url}", msg, file=sys.stderr)
         return ShellExitCode.NetworkError
 
+    return ShellExitCode.NoError
+
+
+def handle_auth(args) -> ShellExitCode:
+    error = check_server_requisites(args.server_url)
+    if error:
+        return ShellExitCode.Error
+
+    tokenobj = login(args.server_url, args.username, args.password)
+    print("Token:", tokenobj.token)
+    print("Expiry:", tokenobj.expiry.isoformat() or "Never")
     return ShellExitCode.NoError
 
 
