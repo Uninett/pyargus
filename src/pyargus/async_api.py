@@ -4,26 +4,29 @@ from simple_rest_client.api import API
 from simple_rest_client.resource import AsyncResource
 
 from .api import (
+    DEFAULT_TIMEOUT,
     ExpiringTokenResource,
     IncidentAcknowledgementResource,
     IncidentEventResource,
     IncidentResource,
+    PublicExpiringTokenResource,
     SourceSystemResource,
+    configure_api_object,
 )
 
 
-def async_connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
+def async_connect(
+    api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT
+) -> API:
     """Connects to an Argus API instance using async resources.
 
     :returns: A connected simple_rest_client API object with async resources
     """
     headers = {"Authorization": "Token " + token}
-    argusapi = API(
+    argusapi = configure_api_object(
         api_root_url=api_root_url,
         headers=headers,
         timeout=timeout,
-        json_encode_body=True,
-        append_slash=True,
     )
     argusapi.add_resource(
         resource_name="incidents", resource_class=AsyncIncidentResource
@@ -40,6 +43,22 @@ def async_connect(api_root_url: str, token: str, timeout: float = 2.0) -> API:
     )
     argusapi.add_resource(
         resource_name="tokens", resource_class=AsyncExpiringTokenResource
+    )
+    return argusapi
+
+
+def async_public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
+    """Connects to an Argus public API instance using async resources.
+
+    :returns: A connected simple_rest_client API object for public endpoints
+    with async resources
+    """
+    argusapi = configure_api_object(
+        api_root_url=api_root_url,
+        timeout=timeout,
+    )
+    argusapi.add_resource(
+        resource_name="tokens", resource_class=AsyncPublicExpiringTokenResource
     )
     return argusapi
 
@@ -62,3 +81,7 @@ class AsyncSourceSystemResource(AsyncResource):
 
 class AsyncExpiringTokenResource(AsyncResource):
     actions = ExpiringTokenResource.actions
+
+
+class AsyncPublicExpiringTokenResource(AsyncResource):
+    actions = PublicExpiringTokenResource.actions

@@ -1,9 +1,10 @@
 from collections.abc import AsyncIterable
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
+from pyargus import async_api
 from pyargus.async_client import AsyncClient
 from pyargus.models import Incident
 from pyargus.time import now as utcnow
@@ -105,6 +106,31 @@ class TestAsyncSupportsHeartbeat:
         return client
 
 
+class TestAsyncLogin:
+    @pytest.mark.asyncio
+    async def test_when_credentials_are_accepted_it_should_use_the_new_token(
+        self, fake_async_public_api
+    ):
+        client = await AsyncClient.login(
+            "https://argus.example.org/api/v2", "user", "secret"
+        )
+        assert client.api.headers["Authorization"] == "Token fresh-token"
+
+
 @pytest.fixture
 def async_api_client(argus_api_url, argus_source_system_token):
     return AsyncClient(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def fake_async_public_api(monkeypatch):
+    public_api = MagicMock()
+    public_api.tokens.login = AsyncMock()
+    public_api.tokens.login.return_value.body = {
+        "token": "fresh-token",
+        "expiry": "2026-10-31T08:00:00+00:00",
+    }
+    monkeypatch.setattr(
+        async_api, "async_public_connect", MagicMock(return_value=public_api)
+    )
+    return public_api

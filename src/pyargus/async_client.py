@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import AsyncIterator, Callable, List, Optional, Tuple
+from typing import AsyncIterator, Callable, List, Optional, Self, Tuple
 
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from . import async_api, models
+from .api import DEFAULT_TIMEOUT
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
 from .time import now as utcnow
 
@@ -20,11 +21,37 @@ class AsyncClient:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = 2.0):
+    def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
         self.api = async_api.async_connect(api_root_url, token, timeout)
+        self.token = token
+        self.token_expires = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
+
+    @classmethod
+    async def login(
+        cls,
+        api_root_url: str,
+        username: str,
+        password: str,
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> Self:
+        """Factory to connect to argus with username and password
+
+        This results in a fresh token that might be useful to store somewhere.
+
+        :raises AuthError: if the server rejects the credentials
+        """
+        public_api = async_api.async_public_connect(api_root_url, timeout=timeout)
+        body = {
+            "username": username,
+            "password": password,
+        }
+        response = await public_api.tokens.login(body=body)
+        client = cls(api_root_url, response.body["token"], timeout)
+        client.token_expires = response.body["expiry"]
+        return client
 
     async def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
+from pyargus import api
 from pyargus.client import Client
 from pyargus.models import Incident
 from pyargus.time import now as utcnow
@@ -119,6 +120,35 @@ class TestRefreshToken:
             side_effect=side_effect, return_value=return_value
         )
         return client
+
+
+class TestLogin:
+    def test_when_credentials_are_accepted_it_should_use_the_new_token(
+        self, fake_public_api
+    ):
+        client = Client.login("https://argus.example.org/api/v2", "user", "secret")
+        assert client.api.headers["Authorization"] == "Token fresh-token"
+
+    def test_when_called_it_should_send_username_and_password(self, fake_public_api):
+        Client.login("https://argus.example.org/api/v2", "user", "secret")
+        body = fake_public_api.tokens.login.call_args.kwargs["body"]
+        assert body == {"username": "user", "password": "secret"}
+
+    def test_when_credentials_are_rejected_it_should_raise(self, fake_public_api):
+        fake_public_api.tokens.login.side_effect = AuthError("403", None)
+        with pytest.raises(AuthError):
+            Client.login("https://argus.example.org/api/v2", "user", "wrong")
+
+
+@pytest.fixture
+def fake_public_api(monkeypatch):
+    public_api = MagicMock()
+    public_api.tokens.login.return_value.body = {
+        "token": "fresh-token",
+        "expiry": "2026-10-31T08:00:00+11:00",
+    }
+    monkeypatch.setattr(api, "public_connect", MagicMock(return_value=public_api))
+    return public_api
 
 
 @pytest.fixture
