@@ -200,29 +200,45 @@ There are two methods:
 
 #### Use an existing, still valid token
 
+You need to already have a token and client.
+
 ```python
 tokenobj = c.refresh_token()
+# stash away token, then...
 c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token)
-# save the contents of tokenobj in an environment variable, config file or
-# secrets file so that it is not lost on program exit
 ```
 
 #### Use a username/password
 
-Use a public connection for this, to avoid using an existing token:
+Use a public connection for this, to avoid using an existing token.
+
+To get the token and expiry for stashing away:
 
 ```python
+from pyargus.client import login
+
 tokenobj = login(
     api_root_url="https://argus.example.org/api/v2",
     username=username,
     password=password,
 )
+# stash away token, then...
 c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token)
-# save the contents of tokenobj in an environment variable, config file or
-# secrets file so that it is not lost on program exit
 ```
 
-Note the first line, `login` is a class method!
+To get a client directly, without opportunity to save the token:
+
+```python
+from pyargus.client import Client
+
+c = Client.login(
+    api_root_url="https://argus.example.org/api/v2",
+    username=username,
+    password=password,
+)
+```
+
+Note that `login` is a class method here.
 
 ### Send a heartbeat
 
