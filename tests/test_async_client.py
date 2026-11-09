@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import async_api
+from pyargus import async_client as client_module
 from pyargus.async_client import AsyncClient
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -106,11 +107,55 @@ class TestAsyncSupportsHeartbeat:
         return client
 
 
+class TestRefreshToken:
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_post_to_the_tokens_refresh_action(self):
+        dummy_body = {
+            "token": "vfbgnhuhgvfhnj",
+            "expiry": "1970-01-01T00:00:00+01:00",
+        }
+        mock = AsyncMock()
+        mock.body = dummy_body
+        client = self._client_with_probe(return_value=mock)
+        refresh = client.api.tokens.refresh
+        result = await client.refresh_token()
+        refresh.assert_awaited_once_with()
+        assert result
+
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_alter_api_header(self):
+        new_token = "vfbgnhuhgvfhnj"
+        dummy_body = {
+            "token": new_token,
+            "expiry": "1970-01-01T00:00:00+01:00",
+        }
+        mock = AsyncMock()
+        mock.body = dummy_body
+        client = self._client_with_probe(return_value=mock)
+        await client.refresh_token()
+        assert client.api.tokens.headers["Authorization"] == f"Token {new_token}"
+
+    @pytest.mark.asyncio
+    async def test_when_credentials_are_invalid_it_should_raise(self):
+        client = self._client_with_probe(side_effect=AuthError("401", None))
+        with pytest.raises(AuthError):
+            await client.refresh_token()
+
+    def _client_with_probe(self, side_effect=None, return_value=None):
+        client = AsyncClient("https://argus.example.org/api/v2", "token")
+        client.api.tokens.refresh = AsyncMock(
+            side_effect=side_effect, return_value=return_value
+        )
+        return client
+
+
 class TestAsyncLogin:
     @pytest.mark.asyncio
     async def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_async_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "login", AsyncMock(return_value=token))
         client = await AsyncClient.login(
             "https://argus.example.org/api/v2", "user", "secret"
         )
@@ -133,9 +178,39 @@ class TestAsyncLogin:
             await AsyncClient.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
-@pytest.fixture
-def async_api_client(argus_api_url, argus_source_system_token):
-    return AsyncClient(argus_api_url, argus_source_system_token)
+# unit
+class TestSetToken:
+    @pytest.mark.asyncio
+    async def test_when_set_on_tokenless_client_it_should_add_header(self):
+        client = AsyncClient("a")
+        assert "Authorization" not in client.api.incidents.headers
+        await client.set_token("b")
+        assert client.api.incidents.headers["Authorization"] == "Token b"
+
+    @pytest.mark.asyncio
+    async def test_when_set_on_token_client_it_should_replace_header(self):
+        client = AsyncClient("a", "token")
+        await client.set_token("new token")
+        assert client.api.incidents.headers["Authorization"] == "Token new token"
+
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_close_the_old_connections(self):
+        client = AsyncClient("a", "token")
+        old_api = client.api
+        old_api.aclose_client = AsyncMock()
+        await client.set_token("new token")
+        old_api.aclose_client.assert_awaited_once_with()
+
+
+# integration
+class TestServerMetadata:
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_return_server_metadata_structure(
+        self, async_public_api_client
+    ):
+        metadata = await async_public_api_client.get_server_metadata()
+        assert "stable" not in metadata.available_api_versions
+        assert metadata.stable_api_version in metadata.available_api_versions
 
 
 @pytest.fixture
@@ -146,7 +221,15 @@ def fake_async_public_api(monkeypatch):
         "token": "fresh-token",
         "expiry": "2026-10-31T08:00:00+00:00",
     }
-    monkeypatch.setattr(
-        async_api, "async_public_connect", MagicMock(return_value=public_api)
-    )
+    monkeypatch.setattr(async_api, "async_connect", MagicMock(return_value=public_api))
     return public_api
+
+
+@pytest.fixture
+def async_api_client(argus_api_url, argus_source_system_token):
+    return AsyncClient(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def async_public_api_client(argus_api_url):
+    return AsyncClient(argus_api_url)

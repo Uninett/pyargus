@@ -12,7 +12,10 @@ from .api import DEFAULT_TIMEOUT
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
 from .time import now as utcnow
 
-__all__ = ["AsyncClient"]
+__all__ = [
+    "AsyncClient",
+    "login",
+]
 
 
 async def login(
@@ -24,7 +27,7 @@ async def login(
 
     :raises AuthError: if the server rejects the credentials
     """
-    public_api = async_api.async_public_connect(api_root_url, timeout=timeout)
+    public_api = async_api.async_connect(api_root_url, timeout=timeout)
     body = {
         "username": username,
         "password": password,
@@ -39,8 +42,15 @@ class AsyncClient:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
-        self.api = async_api.async_connect(api_root_url, token, timeout)
+    def __init__(
+        self,
+        api_root_url: str,
+        token: Optional[str] = None,
+        timeout: float = DEFAULT_TIMEOUT,
+    ):
+        self.api = async_api.async_connect(api_root_url, token=token, timeout=timeout)
+        self.api_root_url = api_root_url
+        self.timeout = timeout
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
@@ -57,9 +67,16 @@ class AsyncClient:
 
         :raises AuthError: if the server rejects the credentials
         """
-        tokenobj = await login(api_root_url, username, password, timeout)
-        client = cls(api_root_url, tokenobj.token, timeout)
+        tokenobj = await login(api_root_url, username, password, timeout=timeout)
+        client = cls(api_root_url, token=tokenobj.token, timeout=timeout)
         return client
+
+    async def set_token(self, token: str) -> None:
+        """Replaces the token used for subsequent requests"""
+        await self.api.aclose_client()
+        self.api = async_api.async_connect(
+            self.api_root_url, token=token, timeout=self.timeout
+        )
 
     async def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""
@@ -229,12 +246,21 @@ class AsyncClient:
     async def refresh_token(self) -> models.ExpiringToken:
         """Post w/o body to get a new token and its expiration timestamp
 
+        Side-effect: replaces the token used by the client.
+
         Store the new token (and the returned expiration datetime if any) where
         your program can load it on next run: environment variable, config file
         or secrets file.
         """
         response = await self.api.tokens.refresh()
-        return models.ExpiringToken.from_json(response.body)
+        tokenobj = models.ExpiringToken.from_json(response.body)
+        await self.set_token(tokenobj.token)
+        return tokenobj
+
+    async def get_server_metadata(self) -> models.ServerMetadata:
+        """Get server metadata"""
+        response = await self.api.metadata.metadata()
+        return models.ServerMetadata.from_json(response.body)
 
 
 async def async_paginated_query(
