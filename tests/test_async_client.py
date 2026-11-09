@@ -5,7 +5,7 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import async_api
-from pyargus.async_client import AsyncClient
+from pyargus.async_client import AsyncClient, PublicAsyncClient
 from pyargus.models import Incident
 from pyargus.time import now as utcnow
 
@@ -133,9 +133,32 @@ class TestAsyncLogin:
             await AsyncClient.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
+# integration
+class TestServerMetadata:
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_return_server_metadata_structure(
+        self, async_public_api_client
+    ):
+        expected_keys = (
+            "server_version",
+            "jsonapi_schema",
+            "available_api_versions",
+            "stable_api_version",
+        )
+        metadata = await async_public_api_client.get_server_metadata()
+        for key in expected_keys:
+            assert hasattr(metadata, key)
+        assert metadata.stable_api_version in metadata.available_api_versions
+
+
 @pytest.fixture
 def async_api_client(argus_api_url, argus_source_system_token):
     return AsyncClient(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def async_public_api_client(argus_api_url):
+    return PublicAsyncClient(argus_api_url)
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
-from pyargus.client import Client
+from pyargus.client import Client, PublicClient
 from pyargus.models import Incident
 from pyargus.time import now as utcnow
 
@@ -140,6 +140,23 @@ class TestLogin:
             Client.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
+# integration
+class TestServerMetadata:
+    def test_when_called_it_should_return_server_metadata_structure(
+        self, public_api_client
+    ):
+        expected_keys = (
+            "server_version",
+            "jsonapi_schema",
+            "available_api_versions",
+            "stable_api_version",
+        )
+        metadata = public_api_client.get_server_metadata()
+        for key in expected_keys:
+            assert hasattr(metadata, key)
+        assert metadata.stable_api_version in metadata.available_api_versions
+
+
 @pytest.fixture
 def fake_public_api(monkeypatch):
     public_api = MagicMock()
@@ -154,3 +171,8 @@ def fake_public_api(monkeypatch):
 @pytest.fixture
 def api_client(argus_api_url, argus_source_system_token):
     return Client(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def public_api_client(argus_api_url):
+    return PublicClient(argus_api_url)

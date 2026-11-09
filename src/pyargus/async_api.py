@@ -10,6 +10,7 @@ from .api import (
     IncidentEventResource,
     IncidentResource,
     PublicExpiringTokenResource,
+    ServerMetadataResource,
     SourceSystemResource,
     configure_api_object,
 )
@@ -60,6 +61,9 @@ def async_public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) ->
     argusapi.add_resource(
         resource_name="tokens", resource_class=AsyncPublicExpiringTokenResource
     )
+    argusapi.add_resource(
+        resource_name="metadata", resource_class=AsyncServerMetadataResource
+    )
     return argusapi
 
 
@@ -85,3 +89,7 @@ class AsyncExpiringTokenResource(AsyncResource):
 
 class AsyncPublicExpiringTokenResource(AsyncResource):
     actions = PublicExpiringTokenResource.actions
+
+
+class AsyncServerMetadataResource(AsyncResource):
+    actions = ServerMetadataResource.actions

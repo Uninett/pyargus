@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Python 3.14 and 3.15 added to test matrix for compatibility testing.
 - Support for getting a token by logging in with username and password.
+- Support for getting server metadata, without using a token, or username/password.
 
 ## [0.8.0] - 2026-09-02
 

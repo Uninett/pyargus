@@ -39,6 +39,9 @@ def public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
     argusapi.add_resource(
         resource_name="tokens", resource_class=PublicExpiringTokenResource
     )
+    argusapi.add_resource(
+        resource_name="metadata", resource_class=ServerMetadataResource
+    )
     return argusapi
 
 
@@ -108,7 +111,7 @@ class ExpiringTokenResource(Resource):
     }
 
 
-# publicly accessible endpoints
+# publicly accessible endpoints, accessed without a token
 
 
 class PublicExpiringTokenResource(Resource):
@@ -116,4 +119,10 @@ class PublicExpiringTokenResource(Resource):
         # When accessed without a token, takes a JSON body with username/password:
         # { "username": "somestring", "password": "someothernonencryptedstring" }
         "login": {"method": "POST", "url": "auth/token/login/"},
+    }
+
+
+class ServerMetadataResource(Resource):
+    actions = {
+        "metadata": {"method": "GET", "url": "../"},
     }

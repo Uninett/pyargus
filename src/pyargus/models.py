@@ -192,3 +192,24 @@ class ExpiringToken:
             "expiry": parse_date(data["expiry"]) if data["expiry"] else None,
         }
         return cls(**kwargs)
+
+
+@dataclass
+class ServerMetadata:
+    """Class for describing server metadata"""
+
+    server_version: str
+    jsonapi_schema: dict[str, str]
+    available_api_versions: set[str]
+    stable_api_version: str
+
+    @classmethod
+    def from_json(cls, data: dict) -> ExpiringToken:
+        kwargs = {
+            "server_version": data["server-version"],
+            "jsonapi_schema": data["jsonapi-schema"],
+            # derived, useful
+            "stable_api_version": data["api-version"]["stable"],
+            "available_api_versions": set(data["jsonapi-schema"].keys()),
+        }
+        return cls(**kwargs)

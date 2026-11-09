@@ -284,6 +284,29 @@ while running:
     sleep(interval)
 ```
 
+## Gettimg metadata about the server
+
+```python
+from pprint import pprint
+
+from pyargus.client import PublicClient
+
+c = PublicClient(api_root_url="https://argus.example.org/api/v2")
+metadata = c.get_server_metadata()
+pprint(vars(metadata))
+```
+
+… which yields a structure looking like this (actual versions may differ):
+
+```python
+{'available_api_versions': {'stable', 'v3', 'v2'},
+ 'jsonapi_schema': {'stable': '/api/schema/',
+                    'v2': '/api/v2/schema/',
+                    'v3': '/api/v3/schema/'},
+ 'server_version': '2.10.2',
+ 'stable_api_version': 'v2'}
+```
+
 ## Async usage
 
 An `AsyncClient` is available for use in asyncio-based applications. It mirrors

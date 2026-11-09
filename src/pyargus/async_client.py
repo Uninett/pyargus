@@ -12,7 +12,11 @@ from .api import DEFAULT_TIMEOUT
 from .client import IncidentType, extract_params, has_next_page, is_paginated_response
 from .time import now as utcnow
 
-__all__ = ["AsyncClient"]
+__all__ = [
+    "AsyncClient",
+    "login",
+    "PublicAsyncClient",
+]
 
 
 async def login(
@@ -31,6 +35,40 @@ async def login(
     }
     response = await public_api.tokens.login(body=body)
     return models.ExpiringToken.from_json(response.body)
+
+
+class PublicAsyncClient:
+    """High-level Argus API client for public endpoints.
+
+    The low-level simple_rest_client API is available in the `api` instance variable.
+    """
+
+    def __init__(self, api_root_url: str, timeout: float = DEFAULT_TIMEOUT):
+        self.api = async_api.async_public_connect(api_root_url, timeout=timeout)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
+
+    async def login(
+        self,
+        api_root_url: str,
+        username: str,
+        password: str,
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> Self:
+        """Factory to connect to argus with username and password
+
+        :raises AuthError: if the server rejects the credentials
+        """
+        return await login(api_root_url, username, password, timeout)
+
+    async def get_server_metadata(self) -> models.ServerMetadata:
+        """Post w/o body to get a dump of server metadata
+
+        Currently the metadata supported is just the sever version
+        """
+        response = await self.api.metadata.metadata()
+        return models.ServerMetadata.from_json(response.body)
 
 
 class AsyncClient:
