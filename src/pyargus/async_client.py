@@ -15,6 +15,24 @@ from .time import now as utcnow
 __all__ = ["AsyncClient"]
 
 
+async def login(
+    api_root_url: str, username: str, password: str, timeout: float = DEFAULT_TIMEOUT
+) -> models.ExpiringToken:
+    """Connect to Argus with username and password
+
+    This results in a fresh token that might be useful to store somewhere.
+
+    :raises AuthError: if the server rejects the credentials
+    """
+    public_api = async_api.async_public_connect(api_root_url, timeout=timeout)
+    body = {
+        "username": username,
+        "password": password,
+    }
+    response = await public_api.tokens.login(body=body)
+    return models.ExpiringToken.from_json(response.body)
+
+
 class AsyncClient:
     """Async high-level Argus API client.
 
@@ -23,8 +41,6 @@ class AsyncClient:
 
     def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
         self.api = async_api.async_connect(api_root_url, token, timeout)
-        self.token = token
-        self.token_expires = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
@@ -39,18 +55,10 @@ class AsyncClient:
     ) -> Self:
         """Factory to connect to argus with username and password
 
-        This results in a fresh token that might be useful to store somewhere.
-
         :raises AuthError: if the server rejects the credentials
         """
-        public_api = async_api.async_public_connect(api_root_url, timeout=timeout)
-        body = {
-            "username": username,
-            "password": password,
-        }
-        response = await public_api.tokens.login(body=body)
-        client = cls(api_root_url, response.body["token"], timeout)
-        client.token_expires = response.body["expiry"]
+        tokenobj = await login(api_root_url, username, password, timeout)
+        client = cls(api_root_url, tokenobj.token, timeout)
         return client
 
     async def get_incident(self, incident_id: int) -> models.Incident:

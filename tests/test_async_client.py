@@ -116,6 +116,22 @@ class TestAsyncLogin:
         )
         assert client.api.headers["Authorization"] == "Token fresh-token"
 
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_send_username_and_password(
+        self, fake_async_public_api
+    ):
+        await AsyncClient.login("https://argus.example.org/api/v2", "user", "secret")
+        body = fake_async_public_api.tokens.login.call_args.kwargs["body"]
+        assert body == {"username": "user", "password": "secret"}
+
+    @pytest.mark.asyncio
+    async def test_when_credentials_are_rejected_it_should_raise(
+        self, fake_async_public_api
+    ):
+        fake_async_public_api.tokens.login.side_effect = AuthError("403", None)
+        with pytest.raises(AuthError):
+            await AsyncClient.login("https://argus.example.org/api/v2", "user", "wrong")
+
 
 @pytest.fixture
 def async_api_client(argus_api_url, argus_source_system_token):
