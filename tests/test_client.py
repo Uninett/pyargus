@@ -6,7 +6,7 @@ from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
 from pyargus.client import Client, PublicClient
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -138,6 +138,21 @@ class TestLogin:
         fake_public_api.tokens.login.side_effect = AuthError("403", None)
         with pytest.raises(AuthError):
             Client.login("https://argus.example.org/api/v2", "user", "wrong")
+
+
+# unit
+class TestPublicClient:
+    def test_when_repr_of_the_instance_it_should_return_the_correct_format(self):
+        url = "hlhl"
+        client = PublicClient(url)
+        assert repr(client) == f"<PublicClient '{url}'>"
+
+    def test_when_calling_login_tt_should_delegate_to_login_function(
+        self, fake_public_api
+    ):
+        result = PublicClient("blbl").login("a", "b", "c")
+        fake_public_api.tokens.login.assert_called_once()
+        assert isinstance(result, ExpiringToken)
 
 
 # integration
