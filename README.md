@@ -299,7 +299,7 @@ pprint(vars(metadata))
 … which yields a structure looking like this (actual versions may differ):
 
 ```python
-{'available_api_versions': {'stable', 'v3', 'v2'},
+{'available_api_versions': {'v3', 'v2'},
  'jsonapi_schema': {'stable': '/api/schema/',
                     'v2': '/api/v2/schema/',
                     'v3': '/api/v3/schema/'},
