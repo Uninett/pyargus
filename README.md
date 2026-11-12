@@ -284,7 +284,7 @@ while running:
     sleep(interval)
 ```
 
-## Gettimg metadata about the server
+### Getting metadata about the server
 
 ```python
 from pprint import pprint
