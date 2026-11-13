@@ -155,23 +155,6 @@ class TestPublicClient:
         assert isinstance(result, ExpiringToken)
 
 
-# integration
-class TestServerMetadata:
-    def test_when_called_it_should_return_server_metadata_structure(
-        self, public_api_client
-    ):
-        expected_keys = (
-            "server_version",
-            "jsonapi_schema",
-            "available_api_versions",
-            "stable_api_version",
-        )
-        metadata = public_api_client.get_server_metadata()
-        for key in expected_keys:
-            assert hasattr(metadata, key)
-        assert metadata.stable_api_version in metadata.available_api_versions
-
-
 @pytest.fixture
 def fake_public_api(monkeypatch):
     public_api = MagicMock()

@@ -149,24 +149,6 @@ class TestPublicAsyncClient:
         assert isinstance(result, ExpiringToken)
 
 
-# integration
-class TestServerMetadata:
-    @pytest.mark.asyncio
-    async def test_when_called_it_should_return_server_metadata_structure(
-        self, async_public_api_client
-    ):
-        expected_keys = (
-            "server_version",
-            "jsonapi_schema",
-            "available_api_versions",
-            "stable_api_version",
-        )
-        metadata = await async_public_api_client.get_server_metadata()
-        for key in expected_keys:
-            assert hasattr(metadata, key)
-        assert metadata.stable_api_version in metadata.available_api_versions
-
-
 @pytest.fixture
 def async_api_client(argus_api_url, argus_source_system_token):
     return AsyncClient(argus_api_url, argus_source_system_token)

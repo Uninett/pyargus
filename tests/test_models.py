@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pyargus.models import ExpiringToken, Incident
+from pyargus.models import ExpiringToken, Incident, ServerMetadata
 from pyargus.multivaluedict import MultiValueDict
 
 
@@ -86,3 +86,43 @@ class TestExpiringToken:
         tokenobj = ExpiringToken.from_json(dummy_json)
         assert tokenobj.token == dummy_json["token"]
         assert tokenobj.expiry is None
+
+
+class TestServerMetadata:
+    response = {
+        "server-version": "2.10.2",
+        "api-version": {"stable": "v2"},
+        "jsonapi-schema": {
+            "stable": "/api/schema/",
+            "v2": "/api/v2/schema/",
+            "v3": "/api/v3/schema/",
+        },
+        "ticket_plugin": "argus_ticket_rt.RequestTrackerPlugin",
+        "destination_plugins": [
+            "argus.notificationprofile.media.email.EmailNotification",
+            "argus.notificationprofile.media.sms_as_email.SMSNotification",
+        ],
+    }
+    expected = (
+        "available_api_versions",
+        "jsonapi_schema",
+        "server_version",
+        "stable_api_version",
+    )
+    metadata = ServerMetadata.from_json(response)
+
+    def test_when_parsing_response_then_ensure_we_have_the_right_structure(self):
+        for key in self.expected:
+            assert hasattr(self.metadata, key)
+
+        # copied without change
+        assert self.metadata.jsonapi_schema == self.response["jsonapi-schema"]
+        assert self.metadata.server_version == self.response["server-version"]
+
+    def test_when_parsing_available_api_versions_then_stable_is_removed(self):
+        assert "stable" not in self.metadata.available_api_versions
+
+    def test_when_parsing_stable_api_version_then_flatten_the_structure(self):
+        assert (
+            self.metadata.stable_api_version == self.response["api-version"]["stable"]
+        )
