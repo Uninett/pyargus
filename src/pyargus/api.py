@@ -1,9 +1,19 @@
 """Defines a low-level API interface for Argus using simple_rest_client"""
 
+import re
+
 from simple_rest_client.api import API
 from simple_rest_client.resource import Resource
 
 DEFAULT_TIMEOUT = 2.0
+API_URL_RE = re.compile(r"^(?P<url>.*/)(?P<api_version>v\d+)/?$")
+
+
+def parse_api_root_url(url):
+    match = API_URL_RE.match(url)
+    if not match:
+        raise ValueError("Malformed url")
+    return match.groups()
 
 
 def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> API:
@@ -39,8 +49,11 @@ def public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
     argusapi.add_resource(
         resource_name="tokens", resource_class=PublicExpiringTokenResource
     )
+    url, _ = parse_api_root_url(api_root_url)
     argusapi.add_resource(
-        resource_name="metadata", resource_class=ServerMetadataResource
+        resource_name="metadata",
+        resource_class=ServerMetadataResource,
+        api_root_url=url,
     )
     return argusapi
 
@@ -124,5 +137,5 @@ class PublicExpiringTokenResource(Resource):
 
 class ServerMetadataResource(Resource):
     actions = {
-        "metadata": {"method": "GET", "url": "../"},
+        "metadata": {"method": "GET", "url": ""},
     }

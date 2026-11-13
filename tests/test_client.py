@@ -143,7 +143,7 @@ class TestLogin:
 # unit
 class TestPublicClient:
     def test_when_repr_of_the_instance_it_should_return_the_correct_format(self):
-        url = "hlhl"
+        url = "hlhl/v45"
         client = PublicClient(url)
         assert repr(client) == f"<PublicClient '{url}'>"
 

@@ -13,6 +13,7 @@ from .api import (
     ServerMetadataResource,
     SourceSystemResource,
     configure_api_object,
+    parse_api_root_url,
 )
 
 
@@ -61,6 +62,7 @@ def async_public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) ->
     argusapi.add_resource(
         resource_name="tokens", resource_class=AsyncPublicExpiringTokenResource
     )
+    url, _ = parse_api_root_url(api_root_url)
     argusapi.add_resource(
         resource_name="metadata", resource_class=AsyncServerMetadataResource
     )
