@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
+from pyargus import client as client_module
 from pyargus.client import Client
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -124,8 +125,10 @@ class TestRefreshToken:
 
 class TestLogin:
     def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "login", MagicMock(return_value=token))
         client = Client.login("https://argus.example.org/api/v2", "user", "secret")
         assert client.api.headers["Authorization"] == "Token fresh-token"
 

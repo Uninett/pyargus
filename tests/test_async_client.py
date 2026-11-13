@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import async_api
+from pyargus import client as client_module
 from pyargus.async_client import AsyncClient
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -109,8 +110,10 @@ class TestAsyncSupportsHeartbeat:
 class TestAsyncLogin:
     @pytest.mark.asyncio
     async def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_async_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "async_login", AsyncMock(return_value=token))
         client = await AsyncClient.login(
             "https://argus.example.org/api/v2", "user", "secret"
         )
