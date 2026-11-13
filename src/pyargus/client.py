@@ -246,10 +246,7 @@ class Client:
         return models.ExpiringToken.from_json(response.body)
 
     def get_server_metadata(self) -> models.ServerMetadata:
-        """Post w/o body to get a dump of server metadata
-
-        Currently the metadata supported is just the sever version
-        """
+        """Get server metadata"""
         response = self.api.metadata.metadata()
         return models.ServerMetadata.from_json(response.body)
 

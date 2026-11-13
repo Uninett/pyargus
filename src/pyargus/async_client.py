@@ -242,10 +242,7 @@ class AsyncClient:
         return models.ExpiringToken.from_json(response.body)
 
     async def get_server_metadata(self) -> models.ServerMetadata:
-        """Post w/o body to get a dump of server metadata
-
-        Currently the metadata supported is just the sever version
-        """
+        """Get server metadata"""
         response = await self.api.metadata.metadata()
         return models.ServerMetadata.from_json(response.body)
 
