@@ -16,12 +16,15 @@ def parse_api_root_url(url):
     return match.groups()
 
 
-def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> API:
+def connect(
+    api_root_url: str, token: str = "", timeout: float = DEFAULT_TIMEOUT
+) -> API:
     """Connects to an Argus API instance.
 
     :returns: A connected simple_rest_client API object
     """
-    headers = {"Authorization": "Token " + token}
+    url, _ = parse_api_root_url(api_root_url)
+    headers = {"Authorization": "Token " + token} if token else None
     argusapi = configure_api_object(
         api_root_url=api_root_url,
         headers=headers,
@@ -34,22 +37,6 @@ def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> 
     )
     argusapi.add_resource(resource_name="sources", resource_class=SourceSystemResource)
     argusapi.add_resource(resource_name="tokens", resource_class=ExpiringTokenResource)
-    return argusapi
-
-
-def public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
-    """Connects to an Argus public API instance.
-
-    :returns: A connected simple_rest_client API object for public endpoints
-    """
-    argusapi = configure_api_object(
-        api_root_url=api_root_url,
-        timeout=timeout,
-    )
-    argusapi.add_resource(
-        resource_name="tokens", resource_class=PublicExpiringTokenResource
-    )
-    url, _ = parse_api_root_url(api_root_url)
     argusapi.add_resource(
         resource_name="metadata",
         resource_class=ServerMetadataResource,
@@ -121,14 +108,6 @@ class ExpiringTokenResource(Resource):
     actions = {
         # When accessed with a token, takes an empty JSON body or nothing
         "refresh": {"method": "POST", "url": "auth/token/login/"},
-    }
-
-
-# publicly accessible endpoints, accessed without a token
-
-
-class PublicExpiringTokenResource(Resource):
-    actions = {
         # When accessed without a token, takes a JSON body with username/password:
         # { "username": "somestring", "password": "someothernonencryptedstring" }
         "login": {"method": "POST", "url": "auth/token/login/"},

@@ -286,12 +286,14 @@ while running:
 
 ### Getting metadata about the server
 
+This endpoint is public so it can be fetched without a token.
+
 ```python
 from pprint import pprint
 
-from pyargus.client import PublicClient
+from pyargus.client import Client
 
-c = PublicClient(api_root_url="https://argus.example.org/api/v2")
+c = Client(api_root_url="https://argus.example.org/api/v2")
 metadata = c.get_server_metadata()
 pprint(vars(metadata))
 ```

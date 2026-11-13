@@ -5,8 +5,8 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
-from pyargus.client import Client, PublicClient
-from pyargus.models import ExpiringToken, Incident
+from pyargus.client import Client
+from pyargus.models import Incident
 from pyargus.time import now as utcnow
 
 
@@ -140,21 +140,6 @@ class TestLogin:
             Client.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
-# unit
-class TestPublicClient:
-    def test_when_repr_of_the_instance_it_should_return_the_correct_format(self):
-        url = "hlhl/v45"
-        client = PublicClient(url)
-        assert repr(client) == f"<PublicClient '{url}'>"
-
-    def test_when_calling_login_tt_should_delegate_to_login_function(
-        self, fake_public_api
-    ):
-        result = PublicClient("blbl").login("a", "b", "c")
-        fake_public_api.tokens.login.assert_called_once()
-        assert isinstance(result, ExpiringToken)
-
-
 @pytest.fixture
 def fake_public_api(monkeypatch):
     public_api = MagicMock()
@@ -162,7 +147,7 @@ def fake_public_api(monkeypatch):
         "token": "fresh-token",
         "expiry": "2026-10-31T08:00:00+11:00",
     }
-    monkeypatch.setattr(api, "public_connect", MagicMock(return_value=public_api))
+    monkeypatch.setattr(api, "connect", MagicMock(return_value=public_api))
     return public_api
 
 
@@ -173,4 +158,4 @@ def api_client(argus_api_url, argus_source_system_token):
 
 @pytest.fixture
 def public_api_client(argus_api_url):
-    return PublicClient(argus_api_url)
+    return Client(argus_api_url)

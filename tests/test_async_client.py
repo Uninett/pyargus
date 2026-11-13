@@ -5,8 +5,8 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import async_api
-from pyargus.async_client import AsyncClient, PublicAsyncClient
-from pyargus.models import ExpiringToken, Incident
+from pyargus.async_client import AsyncClient
+from pyargus.models import Incident
 from pyargus.time import now as utcnow
 
 
@@ -133,20 +133,16 @@ class TestAsyncLogin:
             await AsyncClient.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
-# unit
-class TestPublicAsyncClient:
-    def test_when_repr_of_the_instance_it_should_return_the_correct_format(self):
-        url = "hlhl/v45"
-        client = PublicAsyncClient(url)
-        assert repr(client) == f"<PublicAsyncClient '{url}'>"
-
-    @pytest.mark.asyncio
-    async def test_when_calling_login_tt_should_delegate_to_login_function(
-        self, fake_async_public_api
-    ):
-        result = await PublicAsyncClient("blbl").login("a", "b", "c")
-        fake_async_public_api.tokens.login.assert_awaited_once()
-        assert isinstance(result, ExpiringToken)
+@pytest.fixture
+def fake_async_public_api(monkeypatch):
+    public_api = MagicMock()
+    public_api.tokens.login = AsyncMock()
+    public_api.tokens.login.return_value.body = {
+        "token": "fresh-token",
+        "expiry": "2026-10-31T08:00:00+00:00",
+    }
+    monkeypatch.setattr(async_api, "async_connect", MagicMock(return_value=public_api))
+    return public_api
 
 
 @pytest.fixture
@@ -156,18 +152,4 @@ def async_api_client(argus_api_url, argus_source_system_token):
 
 @pytest.fixture
 def async_public_api_client(argus_api_url):
-    return PublicAsyncClient(argus_api_url)
-
-
-@pytest.fixture
-def fake_async_public_api(monkeypatch):
-    public_api = MagicMock()
-    public_api.tokens.login = AsyncMock()
-    public_api.tokens.login.return_value.body = {
-        "token": "fresh-token",
-        "expiry": "2026-10-31T08:00:00+00:00",
-    }
-    monkeypatch.setattr(
-        async_api, "async_public_connect", MagicMock(return_value=public_api)
-    )
-    return public_api
+    return AsyncClient(argus_api_url)
