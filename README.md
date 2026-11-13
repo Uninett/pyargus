@@ -210,8 +210,6 @@ c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token
 
 #### Use a username/password
 
-Use a public connection for this, to avoid using an existing token.
-
 To get the token and expiry for stashing away:
 
 ```python
@@ -282,6 +280,31 @@ while running:
     if heartbeats_enabled:
         c.send_heartbeat()
     sleep(interval)
+```
+
+### Getting metadata about the server
+
+This endpoint is public so it can be fetched without a token.
+
+```python
+from pprint import pprint
+
+from pyargus.client import Client
+
+c = Client(api_root_url="https://argus.example.org/api/v2")
+metadata = c.get_server_metadata()
+pprint(vars(metadata))
+```
+
+… which yields a structure looking like this (actual versions may differ):
+
+```python
+{'available_api_versions': {'v3', 'v2'},
+ 'jsonapi_schema': {'stable': '/api/schema/',
+                    'v2': '/api/v2/schema/',
+                    'v3': '/api/v3/schema/'},
+ 'server_version': '2.10.2',
+ 'stable_api_version': 'v2'}
 ```
 
 ## Async usage

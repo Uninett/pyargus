@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import async_api
+from pyargus import client as client_module
 from pyargus.async_client import AsyncClient
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -109,8 +110,10 @@ class TestAsyncSupportsHeartbeat:
 class TestAsyncLogin:
     @pytest.mark.asyncio
     async def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_async_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "async_login", AsyncMock(return_value=token))
         client = await AsyncClient.login(
             "https://argus.example.org/api/v2", "user", "secret"
         )
@@ -133,9 +136,21 @@ class TestAsyncLogin:
             await AsyncClient.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
-@pytest.fixture
-def async_api_client(argus_api_url, argus_source_system_token):
-    return AsyncClient(argus_api_url, argus_source_system_token)
+# integration
+class TestServerMetadata:
+    @pytest.mark.asyncio
+    async def test_when_called_it_should_return_server_metadata_structure(
+        self, async_public_api_client
+    ):
+        keys = (
+            "server_version",
+            "jsonapi_schema",
+            "available_api_versions",
+            "stable_api_version",
+        )
+        metadata = await async_public_api_client.get_server_metadata()
+        for key in keys:
+            assert getattr(metadata, key, None)
 
 
 @pytest.fixture
@@ -146,7 +161,15 @@ def fake_async_public_api(monkeypatch):
         "token": "fresh-token",
         "expiry": "2026-10-31T08:00:00+00:00",
     }
-    monkeypatch.setattr(
-        async_api, "async_public_connect", MagicMock(return_value=public_api)
-    )
+    monkeypatch.setattr(async_api, "async_connect", MagicMock(return_value=public_api))
     return public_api
+
+
+@pytest.fixture
+def async_api_client(argus_api_url, argus_source_system_token):
+    return AsyncClient(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def async_public_api_client(argus_api_url):
+    return AsyncClient(argus_api_url)

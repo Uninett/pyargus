@@ -13,7 +13,10 @@ from . import api, models
 from .api import DEFAULT_TIMEOUT
 from .time import now as utcnow
 
-__all__ = ["Client"]
+__all__ = [
+    "Client",
+    "login",
+]
 
 
 IncidentType = TypeVar("IncidentType", int, models.Incident)
@@ -28,7 +31,7 @@ def login(
 
     :raises AuthError: if the server rejects the credentials
     """
-    public_api = api.public_connect(api_root_url, timeout=timeout)
+    public_api = api.connect(api_root_url, timeout=timeout)
     body = {
         "username": username,
         "password": password,
@@ -43,8 +46,12 @@ class Client:
     The low-level simple_rest_client API is available in the `api` instance variable.
     """
 
-    def __init__(self, api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT):
-        self.api = api.connect(api_root_url, token, timeout)
+    def __init__(
+        self, api_root_url: str, token: str = "", timeout: float = DEFAULT_TIMEOUT
+    ):
+        self.api = api.connect(api_root_url, token=token, timeout=timeout)
+        self.api_root_url = api_root_url
+        self.timeout = timeout
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
@@ -61,9 +68,13 @@ class Client:
 
         :raises AuthError: if the server rejects the credentials
         """
-        tokenobj = login(api_root_url, username, password, timeout)
-        client = cls(api_root_url, tokenobj.token, timeout)
+        tokenobj = login(api_root_url, username, password, timeout=timeout)
+        client = cls(api_root_url, token=tokenobj.token, timeout=timeout)
         return client
+
+    def set_token(self, token: str):
+        """Set/replace the token and return a client using the new token"""
+        self.api = api.connect(self.api_root_url, token=token, timeout=self.timeout)
 
     def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""
@@ -239,6 +250,11 @@ class Client:
         """
         response = self.api.tokens.refresh()
         return models.ExpiringToken.from_json(response.body)
+
+    def get_server_metadata(self) -> models.ServerMetadata:
+        """Get server metadata"""
+        response = self.api.metadata.metadata()
+        return models.ServerMetadata.from_json(response.body)
 
 
 def paginated_query(method: Callable, *args, **kwargs) -> Iterator[Tuple]:

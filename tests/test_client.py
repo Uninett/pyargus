@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
+from pyargus import client as client_module
 from pyargus.client import Client
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -124,8 +125,10 @@ class TestRefreshToken:
 
 class TestLogin:
     def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "login", MagicMock(return_value=token))
         client = Client.login("https://argus.example.org/api/v2", "user", "secret")
         assert client.api.headers["Authorization"] == "Token fresh-token"
 
@@ -140,6 +143,22 @@ class TestLogin:
             Client.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
+# integration
+class TestServerMetadata:
+    def test_when_called_it_should_return_server_metadata_structure(
+        self, public_api_client
+    ):
+        keys = (
+            "server_version",
+            "jsonapi_schema",
+            "available_api_versions",
+            "stable_api_version",
+        )
+        metadata = public_api_client.get_server_metadata()
+        for key in keys:
+            assert getattr(metadata, key, None)
+
+
 @pytest.fixture
 def fake_public_api(monkeypatch):
     public_api = MagicMock()
@@ -147,10 +166,15 @@ def fake_public_api(monkeypatch):
         "token": "fresh-token",
         "expiry": "2026-10-31T08:00:00+11:00",
     }
-    monkeypatch.setattr(api, "public_connect", MagicMock(return_value=public_api))
+    monkeypatch.setattr(api, "connect", MagicMock(return_value=public_api))
     return public_api
 
 
 @pytest.fixture
 def api_client(argus_api_url, argus_source_system_token):
     return Client(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def public_api_client(argus_api_url):
+    return Client(argus_api_url)

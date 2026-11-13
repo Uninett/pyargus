@@ -19,11 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The field `expiration` on `ExpiringToken` was renamed to `expiry`. Since `client.refresh_token`, the sole user of `ExpiringToken`, has never worked, this change should not affect any current systems.
 - The `pytest-argus-server` requirement was raised to `>=0.4.0`, the first release that allows consumers to use pytest 8 or newer. This only affects the test dependencies, not the published client library.
+- "token" is now optional when calling `Client`, `AsyncClient`, `connect()` and `async_connect()` since we now support endpoints that don't need authentication. Those that do need authentication will raise `AuthError` if the token is missing.
 
 ### Added
 
 - Python 3.14 and 3.15 added to test matrix for compatibility testing.
 - Support for getting a token by logging in with username and password.
+- Support for getting server metadata, without using a token, or username/password.
 
 ## [0.8.0] - 2026-09-02
 

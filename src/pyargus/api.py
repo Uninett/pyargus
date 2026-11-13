@@ -1,17 +1,26 @@
 """Defines a low-level API interface for Argus using simple_rest_client"""
 
+from urllib.parse import urljoin
+
 from simple_rest_client.api import API
 from simple_rest_client.resource import Resource
 
 DEFAULT_TIMEOUT = 2.0
 
 
-def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> API:
+def server_root_url(api_root_url: str) -> str:
+    """Returns the URL one level above the versioned API root"""
+    return urljoin(api_root_url.rstrip("/") + "/", "..")
+
+
+def connect(
+    api_root_url: str, token: str = "", timeout: float = DEFAULT_TIMEOUT
+) -> API:
     """Connects to an Argus API instance.
 
     :returns: A connected simple_rest_client API object
     """
-    headers = {"Authorization": "Token " + token}
+    headers = {"Authorization": "Token " + token} if token else None
     argusapi = configure_api_object(
         api_root_url=api_root_url,
         headers=headers,
@@ -24,20 +33,10 @@ def connect(api_root_url: str, token: str, timeout: float = DEFAULT_TIMEOUT) -> 
     )
     argusapi.add_resource(resource_name="sources", resource_class=SourceSystemResource)
     argusapi.add_resource(resource_name="tokens", resource_class=ExpiringTokenResource)
-    return argusapi
-
-
-def public_connect(api_root_url: str, timeout: float = DEFAULT_TIMEOUT) -> API:
-    """Connects to an Argus public API instance.
-
-    :returns: A connected simple_rest_client API object for public endpoints
-    """
-    argusapi = configure_api_object(
-        api_root_url=api_root_url,
-        timeout=timeout,
-    )
     argusapi.add_resource(
-        resource_name="tokens", resource_class=PublicExpiringTokenResource
+        resource_name="metadata",
+        resource_class=ServerMetadataResource,
+        api_root_url=server_root_url(api_root_url),
     )
     return argusapi
 
@@ -105,15 +104,13 @@ class ExpiringTokenResource(Resource):
     actions = {
         # When accessed with a token, takes an empty JSON body or nothing
         "refresh": {"method": "POST", "url": "auth/token/login/"},
-    }
-
-
-# publicly accessible endpoints
-
-
-class PublicExpiringTokenResource(Resource):
-    actions = {
         # When accessed without a token, takes a JSON body with username/password:
         # { "username": "somestring", "password": "someothernonencryptedstring" }
         "login": {"method": "POST", "url": "auth/token/login/"},
+    }
+
+
+class ServerMetadataResource(Resource):
+    actions = {
+        "metadata": {"method": "GET", "url": ""},
     }
