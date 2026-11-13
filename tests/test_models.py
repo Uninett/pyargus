@@ -103,26 +103,17 @@ class TestServerMetadata:
             "argus.notificationprofile.media.sms_as_email.SMSNotification",
         ],
     }
-    expected = (
-        "available_api_versions",
-        "jsonapi_schema",
-        "server_version",
-        "stable_api_version",
-    )
-    metadata = ServerMetadata.from_json(response)
 
-    def test_when_parsing_response_then_ensure_we_have_the_right_structure(self):
-        for key in self.expected:
-            assert hasattr(self.metadata, key)
-
+    def test_when_parsing_response_it_should_copy_some_values_unchanged(self):
+        metadata = ServerMetadata.from_json(self.response)
         # copied without change
-        assert self.metadata.jsonapi_schema == self.response["jsonapi-schema"]
-        assert self.metadata.server_version == self.response["server-version"]
+        assert metadata.jsonapi_schema == self.response["jsonapi-schema"]
+        assert metadata.server_version == self.response["server-version"]
 
-    def test_when_parsing_available_api_versions_then_stable_is_removed(self):
-        assert "stable" not in self.metadata.available_api_versions
+    def test_when_parsing_available_api_versions_it_should_remove_stable(self):
+        metadata = ServerMetadata.from_json(self.response)
+        assert "stable" not in metadata.available_api_versions
 
-    def test_when_parsing_stable_api_version_then_flatten_the_structure(self):
-        assert (
-            self.metadata.stable_api_version == self.response["api-version"]["stable"]
-        )
+    def test_when_parsing_stable_api_version_it_should_flatten_the_structure(self):
+        metadata = ServerMetadata.from_json(self.response)
+        assert metadata.stable_api_version == self.response["api-version"]["stable"]
