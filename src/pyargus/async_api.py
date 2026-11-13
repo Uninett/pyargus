@@ -12,7 +12,7 @@ from .api import (
     ServerMetadataResource,
     SourceSystemResource,
     configure_api_object,
-    parse_api_root_url,
+    server_root_url,
 )
 
 
@@ -23,7 +23,6 @@ def async_connect(
 
     :returns: A connected simple_rest_client API object with async resources
     """
-    url, _ = parse_api_root_url(api_root_url)
     headers = {"Authorization": "Token " + token} if token else None
     argusapi = configure_api_object(
         api_root_url=api_root_url,
@@ -49,7 +48,7 @@ def async_connect(
     argusapi.add_resource(
         resource_name="metadata",
         resource_class=AsyncServerMetadataResource,
-        api_root_url=url,
+        api_root_url=server_root_url(api_root_url),
     )
     return argusapi
 
