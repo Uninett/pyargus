@@ -204,7 +204,7 @@ class ServerMetadata:
     stable_api_version: str
 
     @classmethod
-    def from_json(cls, data: dict) -> ExpiringToken:
+    def from_json(cls, data: dict) -> ServerMetadata:
         # hide the alias
         available_api_versions = set(data["jsonapi-schema"]) - {"stable"}
         kwargs = {
