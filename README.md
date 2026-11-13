@@ -210,8 +210,6 @@ c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token
 
 #### Use a username/password
 
-Use a public connection for this, to avoid using an existing token.
-
 To get the token and expiry for stashing away:
 
 ```python
