@@ -46,6 +46,8 @@ class AsyncClient:
         self, api_root_url: str, token: str = "", timeout: float = DEFAULT_TIMEOUT
     ):
         self.api = async_api.async_connect(api_root_url, token=token, timeout=timeout)
+        self.api_root_url = api_root_url
+        self.timeout = timeout
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.api.api_root_url!r}>"
@@ -65,6 +67,12 @@ class AsyncClient:
         tokenobj = await login(api_root_url, username, password, timeout=timeout)
         client = cls(api_root_url, token=tokenobj.token, timeout=timeout)
         return client
+
+    def set_token(self, token: str):
+        """Set/replace the token and return a client using the new token"""
+        self.api = async_api.async_connect(
+            self.api_root_url, token=token, timeout=self.timeout
+        )
 
     async def get_incident(self, incident_id: int) -> models.Incident:
         """Retrieves an incident based on its Argus ID"""
