@@ -47,7 +47,9 @@ def async_connect(
         resource_name="tokens", resource_class=AsyncExpiringTokenResource
     )
     argusapi.add_resource(
-        resource_name="metadata", resource_class=AsyncServerMetadataResource
+        resource_name="metadata",
+        resource_class=AsyncServerMetadataResource,
+        api_root_url=url,
     )
     return argusapi
 
