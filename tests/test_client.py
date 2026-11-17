@@ -5,8 +5,9 @@ import pytest
 from simple_rest_client.exceptions import AuthError, ClientError, NotFoundError
 
 from pyargus import api
+from pyargus import client as client_module
 from pyargus.client import Client
-from pyargus.models import Incident
+from pyargus.models import ExpiringToken, Incident
 from pyargus.time import now as utcnow
 
 
@@ -105,9 +106,22 @@ class TestRefreshToken:
         mock = MagicMock()
         mock.body = dummy_body
         client = self._client_with_probe(return_value=mock)
+        refresh = client.api.tokens.refresh
         result = client.refresh_token()
-        client.api.tokens.refresh.assert_called_once_with()
+        refresh.assert_called_once_with()
         assert result
+
+    def test_when_called_it_should_alter_api_header(self):
+        new_token = "vfbgnhuhgvfhnj"
+        dummy_body = {
+            "token": new_token,
+            "expiry": "1970-01-01T00:00:00+01:00",
+        }
+        mock = MagicMock()
+        mock.body = dummy_body
+        client = self._client_with_probe(return_value=mock)
+        client.refresh_token()
+        assert client.api.tokens.headers["Authorization"] == f"Token {new_token}"
 
     def test_when_credentials_are_invalid_it_should_raise(self):
         client = self._client_with_probe(side_effect=AuthError("401", None))
@@ -124,8 +138,10 @@ class TestRefreshToken:
 
 class TestLogin:
     def test_when_credentials_are_accepted_it_should_use_the_new_token(
-        self, fake_public_api
+        self, monkeypatch
     ):
+        token = ExpiringToken(token="fresh-token")
+        monkeypatch.setattr(client_module, "login", MagicMock(return_value=token))
         client = Client.login("https://argus.example.org/api/v2", "user", "secret")
         assert client.api.headers["Authorization"] == "Token fresh-token"
 
@@ -140,6 +156,37 @@ class TestLogin:
             Client.login("https://argus.example.org/api/v2", "user", "wrong")
 
 
+# unit
+class TestSetToken:
+    def test_when_set_on_tokenless_client_it_should_add_header(self):
+        client = Client("a")
+        assert "Authorization" not in client.api.incidents.headers
+        client.set_token("b")
+        assert client.api.incidents.headers["Authorization"] == "Token b"
+
+    def test_when_set_on_token_client_it_should_replace_header(self):
+        client = Client("a", "token")
+        client.set_token("new token")
+        assert client.api.incidents.headers["Authorization"] == "Token new token"
+
+    def test_when_called_it_should_close_the_old_connections(self):
+        client = Client("a", "token")
+        old_api = client.api
+        old_api.close_client = MagicMock()
+        client.set_token("new token")
+        old_api.close_client.assert_called_once_with()
+
+
+# integration
+class TestServerMetadata:
+    def test_when_called_it_should_return_server_metadata_structure(
+        self, public_api_client
+    ):
+        metadata = public_api_client.get_server_metadata()
+        assert "stable" not in metadata.available_api_versions
+        assert metadata.stable_api_version in metadata.available_api_versions
+
+
 @pytest.fixture
 def fake_public_api(monkeypatch):
     public_api = MagicMock()
@@ -147,10 +194,15 @@ def fake_public_api(monkeypatch):
         "token": "fresh-token",
         "expiry": "2026-10-31T08:00:00+11:00",
     }
-    monkeypatch.setattr(api, "public_connect", MagicMock(return_value=public_api))
+    monkeypatch.setattr(api, "connect", MagicMock(return_value=public_api))
     return public_api
 
 
 @pytest.fixture
 def api_client(argus_api_url, argus_source_system_token):
     return Client(argus_api_url, argus_source_system_token)
+
+
+@pytest.fixture
+def public_api_client(argus_api_url):
+    return Client(argus_api_url)

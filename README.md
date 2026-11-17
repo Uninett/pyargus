@@ -204,13 +204,12 @@ You need to already have a token and client.
 
 ```python
 tokenobj = c.refresh_token()
-# stash away token, then...
-c = Client(api_root_url="https://argus.example.org/api/v2", token=tokenobj.token)
+# stash away token...
 ```
 
-#### Use a username/password
+`c` will be using the freshly fetched token after this.
 
-Use a public connection for this, to avoid using an existing token.
+#### Use a username/password
 
 To get the token and expiry for stashing away:
 
@@ -239,6 +238,26 @@ c = Client.login(
 ```
 
 Note that `login` is a class method here.
+
+### Set a new token in an existing client
+
+```python
+from pyargus.client import Client
+# get a client that works with public endpoints
+c = Client(api_root_url="https://argus.example.org/api/v2")
+
+# get a token as a string from somewhere;
+# * environment variable
+# * secrets file
+# * config file
+# * command line argument
+token = get_token_my_way()
+
+# set it, replacing an existing one
+c.set_token(token)
+```
+
+`c` will be using the given token after this.
 
 ### Send a heartbeat
 
@@ -282,6 +301,31 @@ while running:
     if heartbeats_enabled:
         c.send_heartbeat()
     sleep(interval)
+```
+
+### Getting metadata about the server
+
+This endpoint is public so it can be fetched without a token.
+
+```python
+from pprint import pprint
+
+from pyargus.client import Client
+
+c = Client(api_root_url="https://argus.example.org/api/v2")
+metadata = c.get_server_metadata()
+pprint(vars(metadata))
+```
+
+… which yields a structure looking like this (actual versions may differ):
+
+```python
+{'available_api_versions': {'v3', 'v2'},
+ 'jsonapi_schema': {'stable': '/api/schema/',
+                    'v2': '/api/v2/schema/',
+                    'v3': '/api/v3/schema/'},
+ 'server_version': '2.10.2',
+ 'stable_api_version': 'v2'}
 ```
 
 ## Async usage
